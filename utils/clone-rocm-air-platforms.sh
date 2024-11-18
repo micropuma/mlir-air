@@ -15,5 +15,5 @@
 target_dir=ROCm-air-platforms
 
 if [[ ! -d $target_dir ]]; then
-  git clone https://github.com/Xilinx/ROCm-air-platforms $target_dir
+  git clone git@github.com:micropuma/ROCm-air-platforms.git $target_dir
 fi
