@@ -70,6 +70,6 @@ if [ -x "$(command -v ccache)" ]; then
 fi
 
 cmake $CMAKE_CONFIGS ../llvm 2>&1 | tee cmake.log
-ninja 2>&1 | tee ninja.log
+ninja -j $(nproc) 2>&1 | tee ninja.log
 ninja install 2>&1 | tee ninja-install.log
 )

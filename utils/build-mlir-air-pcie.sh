@@ -54,7 +54,7 @@ cd $BUILD_DIR
 
 PYTHON_ROOT=`pip3 show pybind11 | grep Location | awk '{print $2}'`
 
-cmake .. \
+/home/douliyang/local/bin/cmake .. \
     -GNinja \
     -DCMAKE_C_COMPILER=clang \
     -DCMAKE_CXX_COMPILER=clang++ \

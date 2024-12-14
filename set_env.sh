@@ -1,0 +1,1 @@
+source /usr/xilinx/Environment_Bash/AIE.sh 2023.2

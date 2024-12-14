@@ -14,11 +14,11 @@
 #
 ##===----------------------------------------------------------------------===##
 
-export HASH=779bbd147cd4c934aa0728afa52b1bda076e28f6
+export HASH=e462815b878c761e7eb851efb532f342fb0ad340
 target_dir=mlir-aie
 
 if [[ ! -d $target_dir ]]; then
-  git clone --depth 1 https://github.com/Xilinx/mlir-aie.git $target_dir
+  git clone --depth 1 git@github.com:micropuma/mlir-aie-dly.git $target_dir
 fi
 
 pushd $target_dir

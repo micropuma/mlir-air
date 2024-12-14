@@ -19,7 +19,7 @@ target_dir=llvm
 
 # clone llvm if it is not there already
 if [[ ! -d $target_dir ]]; then
-  git clone --depth 1 https://github.com/llvm/llvm-project.git $target_dir
+  git clone --depth 1 git@github.com:llvm/llvm-project.git $target_dir
 fi
 
 pushd $target_dir

@@ -42,7 +42,7 @@ mkdir -p $MLIR_AIE_DIR/$BUILD_DIR
 mkdir -p $MLIR_AIE_DIR/$INSTALL_DIR
 cd $MLIR_AIE_DIR/$BUILD_DIR
 
-cmake -GNinja \
+/home/douliyang/local/bin/cmake -GNinja \
     -DCMAKE_C_COMPILER=clang \
     -DCMAKE_CXX_COMPILER=clang++ \
     -DLLVM_DIR=${LLVM_DIR}/build/lib/cmake/llvm \
