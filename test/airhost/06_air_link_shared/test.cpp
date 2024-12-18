@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "air.hpp"
-#include "test_library.h"
+#include "../../../mlir-aie/install/runtime
 
 #include "aie_inc.cpp"
 

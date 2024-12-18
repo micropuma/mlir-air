@@ -104,6 +104,10 @@ include_directories(${PROJECT_BINARY_DIR}/mlir/include)
 
 link_directories(${AIE_BINARY_DIR}/lib)
 include_directories(${AIE_INCLUDE_DIRS})
+include_directories(
+  ${CMAKE_SOURCE_DIR}/mlir-aie/install/runtime_lib/x86_64/test_lib/include
+  ${CMAKE_SOURCE_DIR}/mlir-aie/install/runtime_lib/x86_64/xaiengine/include
+)
 
 add_definitions(${LLVM_DEFINITIONS})
 

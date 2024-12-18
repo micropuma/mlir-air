@@ -69,7 +69,7 @@ if [ -x "$(command -v ccache)" ]; then
   CMAKE_CONFIGS="${CMAKE_CONFIGS} -DLLVM_CCACHE_BUILD=ON"
 fi
 
-cmake $CMAKE_CONFIGS ../llvm 2>&1 | tee cmake.log
+/home/douliyang/local/bin/cmake $CMAKE_CONFIGS ../llvm 2>&1 | tee cmake.log
 ninja -j $(nproc) 2>&1 | tee ninja.log
 ninja install 2>&1 | tee ninja-install.log
 )
