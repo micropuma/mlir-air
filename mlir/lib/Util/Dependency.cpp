@@ -604,16 +604,17 @@ bool areAsyncDependent(Operation *a, Operation *b) {
     return false;
   if (!token_b)
     return false;
-  if (dep_a.empty())
-    return false;
-  if (dep_b.empty())
-    return false;
   for (auto dep : dep_a)
     if (dep == token_b)
       return true;
   for (auto dep : dep_b)
     if (dep == token_a)
       return true;
+  // Deep async dependency tracing through air.wait_all.
+  if (isAsyncDependent(a, b))
+    return true;
+  if (isAsyncDependent(b, a))
+    return true;
 
   auto chanA = dyn_cast<air::ChannelInterface>(a);
   auto chanB = dyn_cast<air::ChannelInterface>(b);
@@ -719,8 +720,13 @@ scf::ForOp hoistTargetOpsToNewSCFFor(PatternRewriter &rewriter,
   for (auto op : target_ops) {
     if (op->getParentOp() != for_op.getOperation())
       continue;
-    // Clone operands' defining ops.
-    for (auto operand : op->getOperands()) {
+    // Clone defining ops of both the target_op's operands, and any used values
+    // within its regions.
+    llvm::SetVector<Value> region_opers;
+    for (auto &region : op->getRegions())
+      getUsedValuesDefinedAbove(region, region_opers);
+    region_opers.insert(op->getOperands().begin(), op->getOperands().end());
+    for (auto operand : region_opers) {
       auto operandDepOp = operand.getDefiningOp();
       if (!operandDepOp)
         continue;
@@ -752,25 +758,22 @@ scf::ForOp hoistTargetOpsToNewSCFFor(PatternRewriter &rewriter,
   for (auto erase_op : target_ops) {
     // Reconnect returned tokens.
     rewriter.setInsertionPoint(erase_op);
+    SmallVector<Value> erase_op_async_deps =
+        air::getAsyncDependenciesFromOp(erase_op);
     for (auto res : erase_op->getResults()) {
       if (!isa<air::AsyncTokenType>(res.getType()))
         continue;
-      for (auto u : res.getUsers()) {
-        if (auto async_user = dyn_cast<air::AsyncOpInterface>(u)) {
-          eraseAsyncDependencyFromAsyncOp(async_user, res);
-          for (auto dep : getAsyncDependenciesFromOp(erase_op))
-            if (dep != getLoopCarriedTokenFromScfOp(for_op, "argument"))
-              air::addAsyncDependencyIfNew(u, dep);
-        } else {
-          // User op doesn't have air::AsyncOpInterface. Replace uses with newly
-          // generated air.wait_all op.
-          u->replaceUsesOfWith(
-              res, rewriter
-                       .create<air::WaitAllOp>(
-                           loc, air::AsyncTokenType::get(rewriter.getContext()),
-                           getAsyncDependenciesFromOp(erase_op))
-                       .getAsyncToken());
-        }
+      if (erase_op_async_deps.empty())
+        continue;
+      else if (erase_op_async_deps.size() == 1)
+        res.replaceAllUsesWith(erase_op_async_deps.front());
+      else {
+        res.replaceAllUsesWith(
+            rewriter
+                .create<air::WaitAllOp>(
+                    loc, air::AsyncTokenType::get(rewriter.getContext()),
+                    erase_op_async_deps)
+                .getAsyncToken());
       }
     }
   }
@@ -872,6 +875,141 @@ LogicalResult unrollAIRChannelPutGetInScfParallel(OpBuilder builder,
     clearAsyncDependenciesOfAsyncOp(new_memcpy);
   }
   return success();
+}
+
+// Unroll scf.parallel ops.
+LogicalResult unrollScfParallel(OpBuilder builder, scf::ParallelOp par,
+                                Operation *originalChanOp, IRMapping remap) {
+
+  SmallVector<int, 2> lbs_spatial, ubs_spatial;
+  air::getSizesFromSpatialLoop(par.getOperation(), lbs_spatial, ubs_spatial);
+  std::vector<unsigned> par_size;
+  unsigned par_vol = 1;
+  for (unsigned i = 0; i < lbs_spatial.size(); i++) {
+    par_size.push_back(ubs_spatial[i] - lbs_spatial[i] + 1);
+    par_vol *= ubs_spatial[i] - lbs_spatial[i] + 1;
+  }
+  Operation *curr_new_op = nullptr;
+  for (unsigned iter = 0; iter < par_vol; iter++) {
+    IRMapping localRemap = remap;
+    std::vector<unsigned> position =
+        air::getMDVectorFromIterator(par_size, iter);
+    for (unsigned i = 0; i < position.size(); i++) {
+      localRemap.map(par.getInductionVars()[i],
+                     builder.create<arith::ConstantIndexOp>(
+                         builder.getUnknownLoc(),
+                         position[i] * *getConstantIntValue(par.getStep()[i]) +
+                             *getConstantIntValue(par.getLowerBound()[i])));
+    }
+    // Clone ops
+    for (auto &op : par.getBody()->without_terminator()) {
+      curr_new_op = builder.clone(op, localRemap);
+    }
+  }
+
+  if (auto parToken = getAsyncTokenFromOp(par)) {
+    if (auto tailToken = getAsyncTokenFromOp(curr_new_op)) {
+      parToken.replaceAllUsesWith(tailToken);
+    } else {
+      parToken.replaceAllUsesWith(
+          builder
+              .create<air::WaitAllOp>(
+                  builder.getUnknownLoc(),
+                  air::AsyncTokenType::get(builder.getContext()),
+                  SmallVector<Value>{})
+              .getAsyncToken());
+    }
+  }
+  return success();
+}
+
+// Unroll air.channel.put/get in scf.parallel.
+struct unrollAIRChannelPutInScfParallelPattern
+    : public OpRewritePattern<air::ChannelPutOp> {
+  using OpRewritePattern<air::ChannelPutOp>::OpRewritePattern;
+
+  LogicalResult matchAndRewrite(air::ChannelPutOp put,
+                                PatternRewriter &rewriter) const override {
+    scf::ParallelOp parParentOp = put->getParentOfType<scf::ParallelOp>();
+    SmallVector<scf::ParallelOp> parOps;
+    while (parParentOp) {
+      parOps.push_back(parParentOp);
+      parParentOp = parParentOp->getParentOfType<scf::ParallelOp>();
+    }
+    if (parOps.empty())
+      return failure();
+    IRMapping remap;
+    for (auto par : parOps) {
+      rewriter.setInsertionPoint(par);
+      auto res = unrollScfParallel(rewriter, par, put.getOperation(), remap);
+      if (res.failed())
+        return failure();
+      rewriter.eraseOp(par);
+    }
+    return success();
+  }
+
+private:
+};
+struct unrollAIRChannelGetInScfParallelPattern
+    : public OpRewritePattern<air::ChannelGetOp> {
+  using OpRewritePattern<air::ChannelGetOp>::OpRewritePattern;
+
+  LogicalResult matchAndRewrite(air::ChannelGetOp get,
+                                PatternRewriter &rewriter) const override {
+    scf::ParallelOp parParentOp = get->getParentOfType<scf::ParallelOp>();
+    SmallVector<scf::ParallelOp> parOps;
+    while (parParentOp) {
+      parOps.push_back(parParentOp);
+      parParentOp = parParentOp->getParentOfType<scf::ParallelOp>();
+    }
+    if (parOps.empty())
+      return failure();
+    IRMapping remap;
+    for (auto par : parOps) {
+      rewriter.setInsertionPoint(par);
+      auto res = unrollScfParallel(rewriter, par, get.getOperation(), remap);
+      if (res.failed())
+        return failure();
+      rewriter.eraseOp(par);
+    }
+    return success();
+  }
+
+private:
+};
+
+// Erase empty async scf.parallel ops. Non-empty reduce op region, if filled
+// with air.wait_all, doesn't get automatically canonicalized.
+struct EmptyAIRAsyncScfParallelRemovalPattern
+    : public OpRewritePattern<scf::ParallelOp> {
+  using OpRewritePattern<scf::ParallelOp>::OpRewritePattern;
+
+  LogicalResult matchAndRewrite(scf::ParallelOp par,
+                                PatternRewriter &rewriter) const override {
+    if (llvm::all_of(par.getBody()->without_terminator(), [](Operation &op) {
+          return air::isPure(&op) || isa<air::WaitAllOp>(op);
+        })) {
+      rewriter.replaceOpWithNewOp<air::WaitAllOp>(
+          par, air::AsyncTokenType::get(par->getContext()),
+          getAsyncDependenciesFromOp(par));
+      return success();
+    }
+    return failure();
+  }
+
+private:
+};
+
+void populateAIRunrollAIRChannelPutGetInScfParallelPatterns(
+    RewritePatternSet &patterns) {
+  MLIRContext *ctx = patterns.getContext();
+  patterns.insert<unrollAIRChannelPutInScfParallelPattern,
+                  unrollAIRChannelGetInScfParallelPattern,
+                  EmptyAIRAsyncScfParallelRemovalPattern>(ctx);
+  air::WaitAllOp::getCanonicalizationPatterns(patterns, ctx);
+  air::ExecuteOp::getCanonicalizationPatterns(patterns, ctx);
+  affine::AffineApplyOp::getCanonicalizationPatterns(patterns, ctx);
 }
 
 //===----------------------------------------------------------------------===//

@@ -24,24 +24,32 @@ from air.compiler.aircc.configure import *
 
 import aie.compiler.aiecc.main as aiecc
 
-EXPERIMENTAL_PASSES = [
-    "air-dependency",
-    "air-dependency-schedule-opt",
-    "air-specialize-dma-broadcast",
-    "air-dma-to-channel",
-    "canonicalize",
-    "cse",
-    "air-dependency-canonicalize",
-    "canonicalize",
-    "cse",
-    "func.func(air-loop-fusion)",
-    "air-label-scf-for-to-ping-pong",
-    "air-ping-pong-transform{keep-memref-dealloc=true}",
-    "air-isolate-async-dma-loop-nests",
-    "air-linalg-to-func",
-    "canonicalize",
-    "cse",
-]
+
+def get_experimental_passes(omit_pingpong=True):
+    EXPERIMENTAL_PASSES = [
+        "air-dependency",
+        "air-dependency-schedule-opt",
+        "air-specialize-dma-broadcast",
+        "air-dma-to-channel",
+        "canonicalize",
+        "cse",
+        "air-dependency-canonicalize",
+        "canonicalize",
+        "cse",
+    ]
+    if not omit_pingpong:
+        EXPERIMENTAL_PASSES += [
+            "func.func(air-loop-fusion)",
+            "air-label-scf-for-to-ping-pong",
+            "air-ping-pong-transform{keep-memref-dealloc=true}",
+        ]
+    EXPERIMENTAL_PASSES += [
+        "air-isolate-async-dma-loop-nests",
+        "air-linalg-to-func",
+        "canonicalize",
+        "cse",
+    ]
+    return EXPERIMENTAL_PASSES
 
 
 def emit_wrapper(herd_name="segment", include_name="aie.inc"):
@@ -142,9 +150,7 @@ def lower_airrt_to_airhost(air_to_aie_module, air_placed_module, air_mlir_filena
     )
 
     aie_ctrl = opts.tmpdir + "/aie_ctrl." + air_mlir_filename
-    pass_pipeline = ",".join(
-        ["airrt-to-llvm", "func-bufferize", "func.func(finalizing-bufferize)"]
-    )
+    pass_pipeline = ",".join(["airrt-to-llvm", "one-shot-bufferize"])
     run_passes("builtin.module(" + pass_pipeline + ")", airrt_module, opts, aie_ctrl)
 
     aie_ctrl_refback = opts.tmpdir + "/refback." + air_mlir_filename
@@ -378,7 +384,7 @@ def run(mlir_module, args=None):
                 "func.func(air-lower-herd-parallel)",
             ]
             + (
-                EXPERIMENTAL_PASSES
+                get_experimental_passes(opts.omit_pingpong)
                 if "npu" in opts.device and opts.experimental_passes
                 else []
             )

@@ -310,7 +310,7 @@ module {
 
 // CHECK-LABEL: aie.device(npu1_1col)
 // CHECK:  aiex.runtime_sequence @func6(%[[ARG0:.*]]: memref<8x16xi32>, %[[ARG1:.*]]: memref<16x32xi32>, %[[ARG2:.*]]: memref<8x32xi32>)
-// CHECK:  aiex.npu.dma_memcpy_nd(0, 0, %[[ARG0]][0, 0, 0, 0][2, 1, 8, 16][0, 1, 16, 1]) {id = 0 : i64, metadata = @airMemcpyId4} : memref<8x16xi32>
+// CHECK:  aiex.npu.dma_memcpy_nd(0, 0, %[[ARG0]][0, 0, 0, 0][2, 1, 1, 128][0, 1, 1, 1]) {id = 0 : i64, metadata = @airMemcpyId4} : memref<8x16xi32>
 // CHECK:  aiex.npu.dma_memcpy_nd(0, 0, %[[ARG1]][0, 0, 0, 0][1, 2, 16, 16][1, 16, 32, 1]) {id = 1 : i64, metadata = @airMemcpyId5} : memref<16x32xi32>
 // CHECK:  aiex.npu.dma_memcpy_nd(0, 0, %[[ARG2]][0, 0, 0, 0][1, 2, 8, 16][1, 16, 32, 1]) {id = 2 : i64, metadata = @airMemcpyId12} : memref<8x32xi32>
 
@@ -436,7 +436,7 @@ module {
     %c2_i32 = arith.constant 2 : i32
     %c7_i32 = arith.constant 7 : i32
     %c64_i64 = arith.constant 64 : i64
-    %p = airrt.herd_load "herd" : i64
+    %p = airrt.herd_load "herd" () : () -> i64
     airrt.dma_memcpy_nd(%c7_i32, %c0_i64, %c0_i64, %arg1[%c0_i64, %c0_i64, %c0_i64, %c0_i64], [%c1_i64, %c1_i64, %c1_i64, %c64_i64], [%c0_i64, %c0_i64, %c0_i64]) {metadata = @airMemcpyId7} : (i32, i64, i64, memref<64xi32>, [i64, i64, i64, i64], [i64, i64, i64, i64], [i64, i64, i64])
     return
   }
@@ -1006,8 +1006,8 @@ module {
             %25 = arith.index_cast %20 : index to i64
             %26 = airrt.dma_memcpy_nd(%c31_i32, %22, %c0_i64, %arg0[%c0_i64, %23, %24, %25], [%c1_i64, %c1_i64, %c64_i64, %c64_i64], [%c0_i64, %c4096_i64, %c64_i64]) {metadata = @airMemcpyId31} : (i32, i64, i64, memref<2x64x64xi32>, [i64, i64, i64, i64], [i64, i64, i64, i64], [i64, i64, i64]) : !airrt.event
             affine.for %arg7 = 0 to 1 {
-              %h = airrt.herd_load "herd_0" : i64
-              %h_0 = airrt.herd_load "herd_0" : i64
+              %h = airrt.herd_load "herd_0" () : () -> i64
+              %h_0 = airrt.herd_load "herd_0" () : () -> i64
             }
           }
         }

@@ -894,8 +894,7 @@ Value tileChannelOpByFactor(air::ChannelInterface originalChanOp, int factor,
   Value zeroIdx = builder.create<arith::ConstantIndexOp>(loc, 0);
   if (!originalChanOp.getOffsets().empty()) {
     auto offsetDefOp = originalChanOp.getOffsets()[dim].getDefiningOp();
-    if ((offsetDefOp && isa<affine::AffineApplyOp>(offsetDefOp)) ||
-        isa<air::ExecuteOp>(offsetDefOp))
+    if (offsetDefOp && isa<affine::AffineApplyOp, air::ExecuteOp>(offsetDefOp))
       affineApplyOp = offsetDefOp;
   }
   if (affineApplyOp && isa<affine::AffineApplyOp>(affineApplyOp)) {
@@ -1069,15 +1068,22 @@ void AIRSplitL2MemrefForBufferConstraintPass::partitionMemref(
           for (auto user : iv.getUsers())
             oneUser = user;
           if (auto apply = dyn_cast<affine::AffineApplyOp>(oneUser)) {
-            SmallVector<std::optional<int64_t>> const_ints;
-            for (auto oper : apply->getOperands()) {
+            SmallVector<std::optional<int64_t>> sym_ints;
+            SmallVector<std::optional<int64_t>> dim_ints;
+            for (auto oper : apply.getSymbolOperands()) {
               if (auto constVal = getConstantIntValue(oper))
-                const_ints.push_back(constVal);
+                sym_ints.push_back(constVal);
               else
-                const_ints.push_back(lb);
+                sym_ints.push_back(lb);
+            }
+            for (auto oper : apply.getDimOperands()) {
+              if (auto constVal = getConstantIntValue(oper))
+                dim_ints.push_back(constVal);
+              else
+                dim_ints.push_back(lb);
             }
             auto key_opt = air::evaluateConstantsInMap(apply.getAffineMap(),
-                                                       const_ints, ctx);
+                                                       sym_ints, dim_ints, ctx);
             if (!key_opt)
               return;
             offset_key = *key_opt;
@@ -1479,6 +1485,18 @@ void AIRSplitL2MemrefForBufferConstraintPass::runOnOperation() {
   if (targetMemrefs.empty())
     return;
 
+  // Look up or create a new air.channel name.
+  std::map<std::string, std::string> chanNameMap;
+  auto lookUpOrCreateChanName = [&](std::string chanName, ModuleOp module) {
+    if (chanNameMap.count(chanName))
+      return chanNameMap[chanName];
+    else {
+      auto newChanName = air::createChannelName(module);
+      chanNameMap[chanName] = newChanName;
+      return newChanName;
+    }
+  };
+
   // Tile memrefs.
   llvm::SmallSet<Operation *, 1> erased;
   for (auto allocOp : targetMemrefs) {
@@ -1528,10 +1546,18 @@ void AIRSplitL2MemrefForBufferConstraintPass::runOnOperation() {
         SmallVector<Type, 4> tys = {
             air::AsyncTokenType::get(chanUserOp->getContext())};
         auto cname =
-            air::createChannelName(chanUserOp->getParentOfType<ModuleOp>());
-        SmallVector<int64_t, 2> channel_sizes = {targetColTilingFactor, 1};
-        auto new_chan = builder.create<air::ChannelOp>(
-            loc, cname, builder.getI64ArrayAttr(channel_sizes));
+            lookUpOrCreateChanName(chanUserOp.getChanName().str(),
+                                   chanUserOp->getParentOfType<ModuleOp>());
+        air::ChannelOp new_chan;
+        auto new_chan_op = mlir::SymbolTable::lookupSymbolIn(
+            chanUserOp->getParentOfType<ModuleOp>(), cname);
+        if (new_chan_op) {
+          new_chan = dyn_cast<air::ChannelOp>(new_chan_op);
+        } else {
+          SmallVector<int64_t, 2> channel_sizes = {targetColTilingFactor, 1};
+          new_chan = builder.create<air::ChannelOp>(
+              loc, cname, builder.getI64ArrayAttr(channel_sizes));
+        }
         auto memrefShape = air::getTensorShape(memref.getType());
 
         int dim = 0;

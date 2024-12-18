@@ -6,16 +6,16 @@
 //
 //===----------------------------------------------------------------------===//
 
-// RUN: air-opt %s -air-to-aie="row-offset=3 col-offset=2 device=xcve2802" --split-input-file | FileCheck %s
+// RUN: air-opt %s -air-to-aie="row-offset=2 col-offset=0 device=npu1_4col" --split-input-file | FileCheck %s
 
-// CHECK-LABEL:   aie.device(xcve2802) {
-// CHECK:  %[[VAL_0:.*]] = aie.tile(2, 3)
-// CHECK:  %[[VAL_1:.*]] = aie.tile(2, 0)
+// CHECK-LABEL:   aie.device(npu1_4col) {
+// CHECK:  %[[VAL_0:.*]] = aie.tile(0, 2)
+// CHECK:  %[[VAL_1:.*]] = aie.tile(0, 0)
 // CHECK:  %[[VAL_2:.*]] = aie.lock(%[[VAL_0]], 1) {init = 1 : i32}
 // CHECK:  %[[VAL_3:.*]] = aie.lock(%[[VAL_0]], 0) {init = 0 : i32}
 // CHECK:  %[[VAL_4:.*]] = aie.buffer(%[[VAL_0]]) {{.*}} : memref<1024xi32, 2>
 // CHECK:  %[[VAL_5:.*]] = aie.mem(%[[VAL_0]]) {
-// CHECK:    %[[VAL_6:.*]] = aie.dma_start(S2MM, 0, ^bb1, ^bb2, repeat_count = 1)
+// CHECK:    %[[VAL_6:.*]] = aie.dma_start(S2MM, 0, ^bb1, ^bb2)
 // CHECK:  ^bb1:
 // CHECK:    aie.use_lock(%[[VAL_2]], AcquireGreaterEqual, 1)
 // CHECK:    aie.dma_bd(%[[VAL_4]] : memref<1024xi32, 2>, 0, 1024)
@@ -33,7 +33,7 @@
 // CHECK:    aie.use_lock(%[[VAL_2]], Release, 1)
 // CHECK:    aie.end
 // CHECK:  aie.flow(%[[VAL_1]], DMA : 0, %[[VAL_0]], DMA : 0)
-// CHECK:  aie.shim_dma_allocation @airMemcpyId0(MM2S, 0, 2)
+// CHECK:  aie.shim_dma_allocation @airMemcpyId0(MM2S, 0, 0)
 // CHECK: @func1
 func.func @func1(%arg0 : memref<1024xi32>, %arg1 : memref<1024xi32>) -> () {
   %herd_cols = arith.constant 1 : index
@@ -51,9 +51,9 @@ func.func @func1(%arg0 : memref<1024xi32>, %arg1 : memref<1024xi32>) -> () {
 
 // -----
 
-// CHECK-LABEL:   aie.device(xcve2802) {
-// CHECK: %[[VAL_0:.*]] = aie.tile(2, 3)
-// CHECK: %[[VAL_1:.*]] = aie.tile(2, 0)
+// CHECK-LABEL:   aie.device(npu1_4col) {
+// CHECK: %[[VAL_0:.*]] = aie.tile(0, 2)
+// CHECK: %[[VAL_1:.*]] = aie.tile(0, 0)
 // CHECK: %[[VAL_2:.*]] = aie.lock(%[[VAL_0]], 3) {init = 1 : i32}
 // CHECK: %[[VAL_3:.*]] = aie.lock(%[[VAL_0]], 2) {init = 0 : i32}
 // CHECK: %[[VAL_4:.*]] = aie.lock(%[[VAL_0]], 1) {init = 1 : i32}
@@ -61,7 +61,7 @@ func.func @func1(%arg0 : memref<1024xi32>, %arg1 : memref<1024xi32>) -> () {
 // CHECK: %[[VAL_6:.*]] = aie.buffer(%[[VAL_0]]) {{.*}} : memref<1024xi32, 2>
 // CHECK: %[[VAL_7:.*]] = aie.buffer(%[[VAL_0]]) {{.*}} : memref<512xi32, 2>
 // CHECK: %[[VAL_8:.*]] = aie.mem(%[[VAL_0]]) {
-// CHECK:   %[[VAL_9:.*]] = aie.dma_start(S2MM, 0, ^bb1, ^bb3, repeat_count = 1)
+// CHECK:   %[[VAL_9:.*]] = aie.dma_start(S2MM, 0, ^bb1, ^bb3)
 // CHECK: ^bb1:
 // CHECK:   aie.use_lock(%[[VAL_2]], AcquireGreaterEqual, 1)
 // CHECK:   aie.dma_bd(%[[VAL_6]] : memref<1024xi32, 2>, 0, 1024)
@@ -70,7 +70,7 @@ func.func @func1(%arg0 : memref<1024xi32>, %arg1 : memref<1024xi32>) -> () {
 // CHECK: ^bb2:
 // CHECK:   aie.end
 // CHECK: ^bb3:
-// CHECK:   %[[VAL_10:.*]] = aie.dma_start(MM2S, 0, ^bb4, ^bb2, repeat_count = 1)
+// CHECK:   %[[VAL_10:.*]] = aie.dma_start(MM2S, 0, ^bb4, ^bb2)
 // CHECK: ^bb4:
 // CHECK:   aie.use_lock(%[[VAL_5]], AcquireGreaterEqual, 1)
 // CHECK:   aie.dma_bd(%[[VAL_7]] : memref<512xi32, 2>, 0, 512)
@@ -89,9 +89,9 @@ func.func @func1(%arg0 : memref<1024xi32>, %arg1 : memref<1024xi32>) -> () {
 // CHECK:   aie.end
 // CHECK: aie.flow(%[[VAL_1]], DMA : 0, %[[VAL_0]], DMA : 0)
 // CHECK: aie.flow(%[[VAL_0]], DMA : 0, %[[VAL_1]], DMA : 0)
-// CHECK: aie.shim_dma_allocation @airMemcpyId2(S2MM, 0, 2)
+// CHECK: aie.shim_dma_allocation @airMemcpyId2(S2MM, 0, 0)
 // CHECK: memref.global "public" @airMemcpyId2 : memref<512xi32, 2>
-// CHECK: aie.shim_dma_allocation @airMemcpyId1(MM2S, 0, 2)
+// CHECK: aie.shim_dma_allocation @airMemcpyId1(MM2S, 0, 0)
 // CHECK: memref.global "public" @airMemcpyId1 : memref<1024xi32, 2>
 // CHECK: @func2
 func.func @func2(%arg0 : memref<1024xi32>, %arg1 : memref<1024xi32>) -> () {
@@ -115,9 +115,9 @@ func.func @func2(%arg0 : memref<1024xi32>, %arg1 : memref<1024xi32>) -> () {
 // -----
 
 // air.channel to aie.locks.
-// CHECK-LABEL:   aie.device(xcve2802) {
-// CHECK:         %[[VAL_0:.*]] = aie.tile(2, 0)
-// CHECK:         %[[VAL_1:.*]] = aie.tile(2, 3)
+// CHECK-LABEL:   aie.device(npu1_4col) {
+// CHECK:         %[[VAL_0:.*]] = aie.tile(0, 0)
+// CHECK:         %[[VAL_1:.*]] = aie.tile(0, 2)
 // CHECK:         %[[VAL_2:.*]] = aie.lock(%[[VAL_1]], 3) {init = 1 : i32}
 // CHECK:         %[[VAL_3:.*]] = aie.lock(%[[VAL_1]], 2) {init = 0 : i32}
 // CHECK:         %[[VAL_4:.*]] = aie.lock(%[[VAL_1]], 1) {init = 1 : i32}
@@ -126,7 +126,7 @@ func.func @func2(%arg0 : memref<1024xi32>, %arg1 : memref<1024xi32>) -> () {
 // CHECK:         %[[VAL_7:.*]] = aie.buffer(%[[VAL_1]]) {{{.*}}} : memref<512xi32, 2>
 
 // CHECK:    aie.mem(%[[VAL_1]])  {
-// CHECK:           aie.dma_start(S2MM, 0, ^bb1, ^bb3, repeat_count = 1)
+// CHECK:           aie.dma_start(S2MM, 0, ^bb1, ^bb3)
 // CHECK:         ^bb1:
 // CHECK:           aie.use_lock(%[[VAL_2]], AcquireGreaterEqual, 1)
 // CHECK:           aie.dma_bd(%[[VAL_6]] : memref<1024xi32, 2>, 0, 1024)
@@ -135,7 +135,7 @@ func.func @func2(%arg0 : memref<1024xi32>, %arg1 : memref<1024xi32>) -> () {
 // CHECK:         ^bb2:
 // CHECK:           aie.end
 // CHECK:         ^bb3:
-// CHECK:           aie.dma_start(MM2S, 0, ^bb4, ^bb2, repeat_count = 1)
+// CHECK:           aie.dma_start(MM2S, 0, ^bb4, ^bb2)
 // CHECK:         ^bb4:
 // CHECK:           aie.use_lock(%[[VAL_5]], AcquireGreaterEqual, 1)
 // CHECK:           aie.dma_bd(%[[VAL_7]] : memref<512xi32, 2>, 0, 512)
@@ -157,9 +157,9 @@ func.func @func2(%arg0 : memref<1024xi32>, %arg1 : memref<1024xi32>) -> () {
 
 // CHECK:         aie.flow(%[[VAL_0]], DMA : 0, %[[VAL_1]], DMA : 0)
 // CHECK:         aie.flow(%[[VAL_1]], DMA : 0, %[[VAL_0]], DMA : 0)
-// CHECK:         aie.shim_dma_allocation @airMemcpyId3(S2MM, 0, 2)
+// CHECK:         aie.shim_dma_allocation @airMemcpyId3(S2MM, 0, 0)
 // CHECK:         memref.global "public" @airMemcpyId3 : memref<512xi32, 2>
-// CHECK:         aie.shim_dma_allocation @airMemcpyId2(MM2S, 0, 2)
+// CHECK:         aie.shim_dma_allocation @airMemcpyId2(MM2S, 0, 0)
 // CHECK:         memref.global "public" @airMemcpyId2 : memref<1024xi32, 2>
 // CHECK: @func3
 air.channel @channel_0 [1, 1]
@@ -187,10 +187,10 @@ func.func @func3(%arg0 : memref<1024xi32>, %arg1 : memref<1024xi32>) -> () {
 // -----
 
 // air.channel to aie.locks.
-// CHECK-LABEL:   aie.device(xcve2802) {
-// CHECK:         %[[VAL_2:.*]] = aie.tile(2, 1)
-// CHECK:         %[[VAL_3:.*]] = aie.tile(2, 3)
-// CHECK:         %[[VAL_4:.*]] = aie.tile(2, 0)
+// CHECK-LABEL:   aie.device(npu1_4col) {
+// CHECK:         %[[VAL_2:.*]] = aie.tile(0, 1)
+// CHECK:         %[[VAL_3:.*]] = aie.tile(0, 2)
+// CHECK:         %[[VAL_4:.*]] = aie.tile(0, 0)
 // CHECK:         %[[VAL_5:.*]] = aie.lock(%[[VAL_2]], 3) {init = 1 : i32}
 // CHECK:         %[[VAL_6:.*]] = aie.lock(%[[VAL_2]], 2) {init = 0 : i32}
 // CHECK:         %[[VAL_7:.*]] = aie.lock(%[[VAL_2]], 1) {init = 1 : i32}
@@ -204,7 +204,7 @@ func.func @func3(%arg0 : memref<1024xi32>, %arg1 : memref<1024xi32>) -> () {
 // CHECK:         %[[VAL_23:.*]] = aie.buffer(%[[VAL_3]]) {{{.*}}} : memref<1024xi32, 2>
 
 // CHECK:    aie.mem(%[[VAL_3]])  {
-// CHECK:           aie.dma_start(S2MM, 0, ^bb1, ^bb3, repeat_count = 1)
+// CHECK:           aie.dma_start(S2MM, 0, ^bb1, ^bb3)
 // CHECK:         ^bb1:
 // CHECK:           aie.use_lock(%[[VAL_17]], AcquireGreaterEqual, 1)
 // CHECK:           aie.dma_bd(%[[VAL_23]] : memref<1024xi32, 2>, 0, 1024)
@@ -213,7 +213,7 @@ func.func @func3(%arg0 : memref<1024xi32>, %arg1 : memref<1024xi32>) -> () {
 // CHECK:         ^bb2:
 // CHECK:           aie.end
 // CHECK:         ^bb3:
-// CHECK:           aie.dma_start(MM2S, 0, ^bb4, ^bb2, repeat_count = 1)
+// CHECK:           aie.dma_start(MM2S, 0, ^bb4, ^bb2)
 // CHECK:         ^bb4:
 // CHECK:           aie.use_lock(%[[VAL_20]], AcquireGreaterEqual, 1)
 // CHECK:           aie.dma_bd(%[[VAL_23]] : memref<1024xi32, 2>, 0, 1024)
@@ -235,7 +235,7 @@ func.func @func3(%arg0 : memref<1024xi32>, %arg1 : memref<1024xi32>) -> () {
 // CHECK:         aie.flow(%[[VAL_2]], DMA : 1, %[[VAL_4]], DMA : 0)
 
 // CHECK: aie.memtile_dma(%[[VAL_2]]) {
-// CHECK:   aie.dma_start(S2MM, 0, ^bb1, ^bb7, repeat_count = 1)
+// CHECK:   aie.dma_start(S2MM, 0, ^bb1, ^bb7)
 // CHECK: ^bb1:
 // CHECK:   aie.use_lock(%[[VAL_7]], AcquireGreaterEqual, 1)
 // CHECK:   aie.dma_bd(%[[VAL_21]] : memref<1024xi32, 1>, 0, 1024)
@@ -244,30 +244,30 @@ func.func @func3(%arg0 : memref<1024xi32>, %arg1 : memref<1024xi32>) -> () {
 // CHECK: ^bb2:
 // CHECK:   aie.end
 // CHECK: ^bb3:
-// CHECK:   aie.dma_start(S2MM, 1, ^bb4, ^bb2, repeat_count = 1)
+// CHECK:   aie.dma_start(S2MM, 1, ^bb4, ^bb2)
 // CHECK: ^bb4:
 // CHECK:   aie.use_lock(%[[VAL_5]], AcquireGreaterEqual, 1)
 // CHECK:   aie.dma_bd(%[[VAL_22]] : memref<1024xi32, 1>, 0, 1024)
 // CHECK:   aie.use_lock(%[[VAL_6]], Release, 1)
 // CHECK:   aie.next_bd ^bb4
 // CHECK: ^bb5:
-// CHECK:   aie.dma_start(MM2S, 0, ^bb6, ^bb3, repeat_count = 1)
+// CHECK:   aie.dma_start(MM2S, 0, ^bb6, ^bb3)
 // CHECK: ^bb6:
 // CHECK:   aie.use_lock(%[[VAL_8]], AcquireGreaterEqual, 1)
 // CHECK:   aie.dma_bd(%[[VAL_21]] : memref<1024xi32, 1>, 0, 1024)
 // CHECK:   aie.use_lock(%[[VAL_7]], Release, 1)
 // CHECK:   aie.next_bd ^bb6
 // CHECK: ^bb7:
-// CHECK:   aie.dma_start(MM2S, 1, ^bb8, ^bb5, repeat_count = 1)
+// CHECK:   aie.dma_start(MM2S, 1, ^bb8, ^bb5)
 // CHECK: ^bb8:
 // CHECK:   aie.use_lock(%[[VAL_6]], AcquireGreaterEqual, 1)
 // CHECK:   aie.dma_bd(%[[VAL_22]] : memref<1024xi32, 1>, 0, 1024)
 // CHECK:   aie.use_lock(%[[VAL_5]], Release, 1)
 // CHECK:   aie.next_bd ^bb8
 // CHECK: }
-// CHECK: aie.shim_dma_allocation @airMemcpyId7(S2MM, 0, 2)
+// CHECK: aie.shim_dma_allocation @airMemcpyId7(S2MM, 0, 0)
 // CHECK: memref.global "public" @airMemcpyId7 : memref<1024xi32, 1>
-// CHECK: aie.shim_dma_allocation @airMemcpyId2(MM2S, 0, 2)
+// CHECK: aie.shim_dma_allocation @airMemcpyId2(MM2S, 0, 0)
 // CHECK: memref.global "public" @airMemcpyId2 : memref<1024xi32, 1>
 // CHECK: @func4
 air.channel @channel_2 [1, 1]
@@ -306,24 +306,24 @@ func.func @func4(%arg0 : memref<1024xi32>, %arg1 : memref<1024xi32>) -> () {
 
 // L2 to L1 broadcast
 // CHECK: aie.device
-// CHECK:         %[[VAL_0:.*]] = aie.tile(2, 0)
-// CHECK:         %[[VAL_1:.*]] = aie.tile(2, 1)
-// CHECK:         %[[VAL_2:.*]] = aie.tile(2, 3)
-// CHECK:         %[[VAL_3:.*]] = aie.tile(3, 3)
-// CHECK:         %[[VAL_4:.*]] = aie.tile(4, 3)
-// CHECK:         %[[VAL_5:.*]] = aie.tile(5, 3)
-// CHECK:         %[[VAL_6:.*]] = aie.tile(2, 4)
-// CHECK:         %[[VAL_7:.*]] = aie.tile(3, 4)
-// CHECK:         %[[VAL_8:.*]] = aie.tile(4, 4)
-// CHECK:         %[[VAL_9:.*]] = aie.tile(5, 4)
-// CHECK:         %[[VAL_10:.*]] = aie.tile(2, 5)
-// CHECK:         %[[VAL_11:.*]] = aie.tile(3, 5)
-// CHECK:         %[[VAL_12:.*]] = aie.tile(4, 5)
-// CHECK:         %[[VAL_13:.*]] = aie.tile(5, 5)
-// CHECK:         %[[VAL_14:.*]] = aie.tile(2, 6)
-// CHECK:         %[[VAL_15:.*]] = aie.tile(3, 6)
-// CHECK:         %[[VAL_16:.*]] = aie.tile(4, 6)
-// CHECK:         %[[VAL_17:.*]] = aie.tile(5, 6)
+// CHECK:         %[[VAL_0:.*]] = aie.tile(0, 0)
+// CHECK:         %[[VAL_1:.*]] = aie.tile(0, 1)
+// CHECK:         %[[VAL_2:.*]] = aie.tile(0, 2)
+// CHECK:         %[[VAL_3:.*]] = aie.tile(1, 2)
+// CHECK:         %[[VAL_4:.*]] = aie.tile(2, 2)
+// CHECK:         %[[VAL_5:.*]] = aie.tile(3, 2)
+// CHECK:         %[[VAL_6:.*]] = aie.tile(0, 3)
+// CHECK:         %[[VAL_7:.*]] = aie.tile(1, 3)
+// CHECK:         %[[VAL_8:.*]] = aie.tile(2, 3)
+// CHECK:         %[[VAL_9:.*]] = aie.tile(3, 3)
+// CHECK:         %[[VAL_10:.*]] = aie.tile(0, 4)
+// CHECK:         %[[VAL_11:.*]] = aie.tile(1, 4)
+// CHECK:         %[[VAL_12:.*]] = aie.tile(2, 4)
+// CHECK:         %[[VAL_13:.*]] = aie.tile(3, 4)
+// CHECK:         %[[VAL_14:.*]] = aie.tile(0, 5)
+// CHECK:         %[[VAL_15:.*]] = aie.tile(1, 5)
+// CHECK:         %[[VAL_16:.*]] = aie.tile(2, 5)
+// CHECK:         %[[VAL_17:.*]] = aie.tile(3, 5)
 
 // CHECK:         aie.flow(%[[VAL_0]], DMA : 0, %[[VAL_1]], DMA : 0)
 // CHECK:         aie.flow(%[[VAL_1]], DMA : 0, %[[VAL_2]], DMA : 0)
@@ -335,7 +335,7 @@ func.func @func4(%arg0 : memref<1024xi32>, %arg1 : memref<1024xi32>) -> () {
 // CHECK:         aie.flow(%[[VAL_1]], DMA : 1, %[[VAL_4]], DMA : 0)
 // CHECK:         aie.flow(%[[VAL_1]], DMA : 1, %[[VAL_5]], DMA : 0)
 
-// CHECK:         aie.shim_dma_allocation @airMemcpyId6(MM2S, 0, 2)
+// CHECK:         aie.shim_dma_allocation @airMemcpyId6(MM2S, 0, 0)
 // CHECK:         memref.global "public" @airMemcpyId6 : memref<1024xi32, 1>
 // CHECK: @func5
 #set = affine_set<()[s0, s1] : (s0 == 0, s1 >= 0, -s1 + 3 >= 0)>
@@ -396,25 +396,25 @@ func.func @func5(%arg0 : memref<1024xi32>) -> () {
 // -----
 
 // L3 to L1 parallel shim dmas
-// CHECK: aie.device(xcve2802)
-// CHECK: %[[tile_2_0:.*]] = aie.tile(2, 0)
-// CHECK: %[[tile_3_0:.*]] = aie.tile(3, 0)
+// CHECK: aie.device(npu1_4col)
+// CHECK: %[[tile_0_0:.*]] = aie.tile(0, 0)
+// CHECK: %[[tile_1_0:.*]] = aie.tile(1, 0)
 // CHECK: %[[tile_0_3:.*]] = aie.tile(0, 3)
 // CHECK: %[[tile_1_3:.*]] = aie.tile(1, 3)
 // CHECK: %[[tile_0_4:.*]] = aie.tile(0, 4)
 // CHECK: %[[tile_1_4:.*]] = aie.tile(1, 4)
 
-// CHECK:  aie.flow(%[[tile_0_3]], DMA : 0, %[[tile_2_0]], DMA : 0)
-// CHECK:  aie.flow(%[[tile_1_3]], DMA : 0, %[[tile_2_0]], DMA : 1)
-// CHECK:  aie.flow(%[[tile_0_4]], DMA : 0, %[[tile_3_0]], DMA : 0)
-// CHECK:  aie.flow(%[[tile_1_4]], DMA : 0, %[[tile_3_0]], DMA : 1)
-// CHECK:  aie.shim_dma_allocation @airMemcpyId14(S2MM, 0, 2)
+// CHECK:  aie.flow(%[[tile_0_3]], DMA : 0, %[[tile_0_0]], DMA : 0)
+// CHECK:  aie.flow(%[[tile_1_3]], DMA : 0, %[[tile_1_0]], DMA : 0)
+// CHECK:  aie.flow(%[[tile_0_4]], DMA : 0, %[[tile_0_0]], DMA : 1)
+// CHECK:  aie.flow(%[[tile_1_4]], DMA : 0, %[[tile_1_0]], DMA : 1)
+// CHECK:  aie.shim_dma_allocation @airMemcpyId14(S2MM, 0, 0)
 // CHECK:  memref.global "public" @airMemcpyId14 : memref<4x4xi32, 2>
-// CHECK:  aie.shim_dma_allocation @airMemcpyId14_1(S2MM, 1, 2)
+// CHECK:  aie.shim_dma_allocation @airMemcpyId14_1(S2MM, 0, 1)
 // CHECK:  memref.global "public" @airMemcpyId14_1 : memref<4x4xi32, 2>
-// CHECK:  aie.shim_dma_allocation @airMemcpyId14_2(S2MM, 0, 3)
+// CHECK:  aie.shim_dma_allocation @airMemcpyId14_2(S2MM, 1, 0)
 // CHECK:  memref.global "public" @airMemcpyId14_2 : memref<4x4xi32, 2>
-// CHECK:  aie.shim_dma_allocation @airMemcpyId14_3(S2MM, 1, 3)
+// CHECK:  aie.shim_dma_allocation @airMemcpyId14_3(S2MM, 1, 1)
 // CHECK:  memref.global "public" @airMemcpyId14_3 : memref<4x4xi32, 2>
 
 // CHECK: @func6
@@ -466,23 +466,23 @@ func.func @func6(%arg5 : memref<8x8xi32>) {
 // -----
 
 // Multi-dimensional memref copy to wraps and strides
-// CHECK: aie.device(xcve2802)
+// CHECK: aie.device(npu1_4col)
 // CHECK: %[[memTileDMA_2_1:.*]] = aie.memtile_dma
-// CHECK:   aie.dma_start(S2MM, 0, ^bb1, ^bb5, repeat_count = 1)
+// CHECK:   aie.dma_start(S2MM, 0, ^bb1, ^bb5)
 // CHECK: ^bb1:  // 2 preds: ^bb0, ^bb1
 // CHECK:   aie.use_lock({{.*}}, AcquireGreaterEqual, 1)
 // CHECK:   aie.dma_bd({{.*}} : memref<4x4xi32, 1>, 0, 16)
 // CHECK:   aie.use_lock({{.*}}, Release, 1)
 // CHECK:   aie.next_bd ^bb1
 // CHECK: ^bb3:  // pred: ^bb5
-// CHECK:   aie.dma_start(S2MM, 1, ^bb4, ^bb2, repeat_count = 1)
+// CHECK:   aie.dma_start(S2MM, 1, ^bb4, ^bb2)
 // CHECK: ^bb4:  // 2 preds: ^bb3, ^bb4
 // CHECK:   aie.use_lock({{.*}}, AcquireGreaterEqual, 1)
 // CHECK:   aie.dma_bd({{.*}} : memref<8x16xi32, 1>, 0, 16, [<size = 4, stride = 16>, <size = 4, stride = 1>])
 // CHECK:   aie.use_lock({{.*}}, Release, 1)
 // CHECK:   aie.next_bd ^bb4
 // CHECK: ^bb5:  // pred: ^bb0
-// CHECK:   aie.dma_start(MM2S, 0, ^bb6, ^bb3, repeat_count = 1)
+// CHECK:   aie.dma_start(MM2S, 0, ^bb6, ^bb3)
 // CHECK: ^bb6:  // 2 preds: ^bb5, ^bb6
 // CHECK:   aie.use_lock({{.*}}, AcquireGreaterEqual, 1)
 // CHECK:   aie.dma_bd({{.*}} : memref<4x4xi32, 1>, 0, 16)
@@ -522,9 +522,9 @@ func.func @func7(%arg0 : memref<8x16xi32>, %arg1 : memref<16x8xi32>){
 // -----
 
 // Multi-dimensional memref copy to wraps and strides, with offsets having more dims than memref type.
-// CHECK: aie.device(xcve2802)
+// CHECK: aie.device(npu1_4col)
 // CHECK: %[[memTileDMA_2_1:.*]] = aie.memtile_dma
-// CHECK:   aie.dma_start(MM2S, 0, ^bb1, ^bb2, repeat_count = 1)
+// CHECK:   aie.dma_start(MM2S, 0, ^bb1, ^bb2)
 // CHECK: ^bb1:  // 2 preds: ^bb0, ^bb1
 // CHECK:   aie.use_lock({{.*}}, AcquireGreaterEqual, 1)
 // CHECK:   aie.dma_bd({{.*}} : memref<64x256xi32, 1>, 8192, 8192, [<size = 8, stride = 32>, <size = 32, stride = 256>, <size = 32, stride = 1>])
@@ -559,17 +559,17 @@ func.func @func8(%arg0 : memref<8x16xi32>, %arg1 : memref<16x8xi32>){
 // -----
 
 // 1D scf.parallel iteration space support.
-// CHECK: aie.device(xcve2802)
+// CHECK: aie.device(npu1_4col)
 // CHECK: %[[tileDMA_0_4:.*]] = aie.mem
-// CHECK:   aie.dma_start(S2MM, 0, ^bb1, ^bb2, repeat_count = 1)
+// CHECK:   aie.dma_start(S2MM, 0, ^bb1, ^bb2)
 // CHECK:   aie.dma_bd({{.*}} : memref<32xf32, 2>, 0, 32)
 // CHECK: %[[tileDMA_0_3:.*]] = aie.mem
-// CHECK:   aie.dma_start(S2MM, 0, ^bb1, ^bb2, repeat_count = 1)
+// CHECK:   aie.dma_start(S2MM, 0, ^bb1, ^bb2)
 // CHECK:   aie.dma_bd({{.*}} : memref<32xf32, 2>, 0, 32)
 // CHECK: %[[memTileDMA_2_1:.*]] = aie.memtile_dma
-// CHECK:   aie.dma_start(MM2S, 0, ^bb1, ^bb3, repeat_count = 1)
+// CHECK:   aie.dma_start(MM2S, 0, ^bb1, ^bb3)
 // CHECK:   aie.dma_bd({{.*}} : memref<64xf32, 1>, 0, 32)
-// CHECK:   aie.dma_start(MM2S, 1, ^bb4, ^bb2, repeat_count = 1)
+// CHECK:   aie.dma_start(MM2S, 1, ^bb4, ^bb2)
 // CHECK:   aie.dma_bd({{.*}} : memref<64xf32, 1>, 32, 32)
 // CHECK: @func9
 #map = affine_map<()[s0] -> (s0 * 32)>
@@ -621,17 +621,17 @@ func.func @func9(%arg0: memref<128xf32>, %arg1: memref<128xf32>) {
 // -----
 
 // Tile / memtile DMA repeat count support.
-// CHECK: aie.device(xcve2802)
+// CHECK: aie.device(npu1_4col)
 // CHECK: %[[tileDMA_0_4:.*]] = aie.mem
-// CHECK:   aie.dma_start(S2MM, 0, ^bb1, ^bb2, repeat_count = 1)
+// CHECK:   aie.dma_start(S2MM, 0, ^bb1, ^bb2)
 // CHECK:   aie.dma_bd({{.*}} : memref<32x256xi32, 2>, 0, 8192)
 // CHECK: %[[tileDMA_0_3:.*]] = aie.mem
-// CHECK:   aie.dma_start(S2MM, 0, ^bb1, ^bb2, repeat_count = 1)
+// CHECK:   aie.dma_start(S2MM, 0, ^bb1, ^bb2)
 // CHECK:   aie.dma_bd({{.*}} : memref<32x256xi32, 2>, 0, 8192)
 // CHECK: %[[memTileDMA_2_1:.*]] = aie.memtile_dma
-// CHECK:   aie.dma_start(MM2S, 0, ^bb1, ^bb3, repeat_count = 1)
+// CHECK:   aie.dma_start(MM2S, 0, ^bb1, ^bb3)
 // CHECK:   aie.dma_bd({{.*}} : memref<32x256xi32, 1>, 0, 8192)
-// CHECK:   aie.dma_start(MM2S, 1, ^bb4, ^bb2, repeat_count = 1)
+// CHECK:   aie.dma_start(MM2S, 1, ^bb4, ^bb2)
 // CHECK:   aie.dma_bd({{.*}} : memref<32x256xi32, 1>, 0, 8192)
 // CHECK: @func10
 #map = affine_map<()[s0] -> (s0 * 32)>
@@ -683,17 +683,17 @@ func.func @func10(%arg0: memref<128xf32>, %arg1: memref<128xf32>) {
 // -----
 
 // Bf16 datatype support.
-// CHECK: aie.device(xcve2802)
+// CHECK: aie.device(npu1_4col)
 // CHECK: %[[tileDMA_0_4:.*]] = aie.mem
-// CHECK:   aie.dma_start(S2MM, 0, ^bb1, ^bb2, repeat_count = 1)
+// CHECK:   aie.dma_start(S2MM, 0, ^bb1, ^bb2)
 // CHECK:   aie.dma_bd({{.*}} : memref<32x256xbf16, 2>, 0, 8192, [<size = 8, stride = 32>, <size = 32, stride = 256>, <size = 32, stride = 1>])
 // CHECK: %[[tileDMA_0_3:.*]] = aie.mem
-// CHECK:   aie.dma_start(S2MM, 0, ^bb1, ^bb2, repeat_count = 1)
+// CHECK:   aie.dma_start(S2MM, 0, ^bb1, ^bb2)
 // CHECK:   aie.dma_bd({{.*}} : memref<32x256xbf16, 2>, 0, 8192, [<size = 8, stride = 32>, <size = 32, stride = 256>, <size = 32, stride = 1>])
 // CHECK: %[[memTileDMA_2_1:.*]] = aie.memtile_dma
-// CHECK:   aie.dma_start(MM2S, 0, ^bb1, ^bb3, repeat_count = 1)
+// CHECK:   aie.dma_start(MM2S, 0, ^bb1, ^bb3)
 // CHECK:   memref<32x256xbf16, 1>, 0, 8192)
-// CHECK:   aie.dma_start(MM2S, 1, ^bb4, ^bb2, repeat_count = 1)
+// CHECK:   aie.dma_start(MM2S, 1, ^bb4, ^bb2)
 // CHECK:   memref<32x256xbf16, 1>, 0, 8192)
 // CHECK: @func11
 #map = affine_map<()[s0] -> (s0 * 32)>
@@ -747,13 +747,19 @@ func.func @func11(%arg0: memref<128xbf16>, %arg1: memref<128xbf16>) {
 // -----
 
 // 4x4 herd support.
-// CHECK: aie.device(xcve2802)
+// CHECK: aie.device(npu1_4col)
+// CHECK: %[[tile_0_0:.*]] = aie.tile(0, 0)
+// CHECK: %[[tile_1_0:.*]] = aie.tile(1, 0)
 // CHECK: %[[tile_2_0:.*]] = aie.tile(2, 0)
 // CHECK: %[[tile_3_0:.*]] = aie.tile(3, 0)
+// CHECK: %[[tile_0_1:.*]] = aie.tile(0, 1)
+// CHECK: %[[tile_1_1:.*]] = aie.tile(1, 1)
 // CHECK: %[[tile_2_1:.*]] = aie.tile(2, 1)
 // CHECK: %[[tile_3_1:.*]] = aie.tile(3, 1)
-// CHECK: %[[tile_4_1:.*]] = aie.tile(4, 1)
-// CHECK: %[[tile_5_1:.*]] = aie.tile(5, 1)
+// CHECK: %[[tile_0_2:.*]] = aie.tile(0, 2)
+// CHECK: %[[tile_1_2:.*]] = aie.tile(1, 2)
+// CHECK: %[[tile_2_2:.*]] = aie.tile(2, 2)
+// CHECK: %[[tile_3_2:.*]] = aie.tile(3, 2)
 // CHECK: %[[tile_0_3:.*]] = aie.tile(0, 3)
 // CHECK: %[[tile_1_3:.*]] = aie.tile(1, 3)
 // CHECK: %[[tile_2_3:.*]] = aie.tile(2, 3)
@@ -766,34 +772,26 @@ func.func @func11(%arg0: memref<128xbf16>, %arg1: memref<128xbf16>) {
 // CHECK: %[[tile_1_5:.*]] = aie.tile(1, 5)
 // CHECK: %[[tile_2_5:.*]] = aie.tile(2, 5)
 // CHECK: %[[tile_3_5:.*]] = aie.tile(3, 5)
-// CHECK: %[[tile_0_6:.*]] = aie.tile(0, 6)
-// CHECK: %[[tile_1_6:.*]] = aie.tile(1, 6)
-// CHECK: %[[tile_2_6:.*]] = aie.tile(2, 6)
-// CHECK: %[[tile_3_6:.*]] = aie.tile(3, 6)
-// CHECK: %[[buf19:.*]] = aie.buffer(%[[tile_2_1]]) {{{.*}}} : memref<64x256xbf16, 1>
-// CHECK: %[[buf18:.*]] = aie.buffer(%[[tile_3_1]]) {{{.*}}} : memref<64x256xbf16, 1>
-// CHECK: %[[buf17:.*]] = aie.buffer(%[[tile_4_1]]) {{{.*}}} : memref<64x256xbf16, 1>
-// CHECK: %[[buf16:.*]] = aie.buffer(%[[tile_5_1]]) {{{.*}}} : memref<64x256xbf16, 1>
-// CHECK: %[[buf15:.*]] = aie.buffer(%[[tile_3_6]]) {{{.*}}} : memref<16x16x4x4xbf16, 2>
-// CHECK: %[[buf14:.*]] = aie.buffer(%[[tile_2_6]]) {{{.*}}} : memref<16x16x4x4xbf16, 2>
-// CHECK: %[[buf13:.*]] = aie.buffer(%[[tile_1_6]]) {{{.*}}} : memref<16x16x4x4xbf16, 2>
-// CHECK: %[[buf12:.*]] = aie.buffer(%[[tile_0_6]]) {{{.*}}} : memref<16x16x4x4xbf16, 2>
-// CHECK: %[[buf11:.*]] = aie.buffer(%[[tile_3_5]]) {{{.*}}} : memref<16x16x4x4xbf16, 2>
-// CHECK: %[[buf10:.*]] = aie.buffer(%[[tile_2_5]]) {{{.*}}} : memref<16x16x4x4xbf16, 2>
-// CHECK: %[[buf9:.*]] = aie.buffer(%[[tile_1_5]]) {{{.*}}} : memref<16x16x4x4xbf16, 2>
-// CHECK: %[[buf8:.*]] = aie.buffer(%[[tile_0_5]]) {{{.*}}} : memref<16x16x4x4xbf16, 2>
-// CHECK: %[[buf7:.*]] = aie.buffer(%[[tile_3_4]]) {{{.*}}} : memref<16x16x4x4xbf16, 2>
-// CHECK: %[[buf6:.*]] = aie.buffer(%[[tile_2_4]]) {{{.*}}} : memref<16x16x4x4xbf16, 2>
-// CHECK: %[[buf5:.*]] = aie.buffer(%[[tile_1_4]]) {{{.*}}} : memref<16x16x4x4xbf16, 2>
-// CHECK: %[[buf4:.*]] = aie.buffer(%[[tile_0_4]]) {{{.*}}} : memref<16x16x4x4xbf16, 2>
-// CHECK: %[[buf3:.*]] = aie.buffer(%[[tile_3_3]]) {{{.*}}} : memref<16x16x4x4xbf16, 2>
-// CHECK: %[[buf2:.*]] = aie.buffer(%[[tile_2_3]]) {{{.*}}} : memref<16x16x4x4xbf16, 2>
-// CHECK: %[[buf1:.*]] = aie.buffer(%[[tile_1_3]]) {{{.*}}} : memref<16x16x4x4xbf16, 2>
-// CHECK: %[[buf0:.*]] = aie.buffer(%[[tile_0_3]]) {{{.*}}} : memref<16x16x4x4xbf16, 2>
-// CHECK: aie.core(%[[tile_3_6]])
-// CHECK: aie.core(%[[tile_2_6]])
-// CHECK: aie.core(%[[tile_1_6]])
-// CHECK: aie.core(%[[tile_0_6]])
+// CHECK: %[[buf19:.*]] = aie.buffer(%[[tile_0_1]]) {sym_name = "buf19"} : memref<64x256xbf16, 1> 
+// CHECK: %[[buf18:.*]] = aie.buffer(%[[tile_1_1]]) {sym_name = "buf18"} : memref<64x256xbf16, 1> 
+// CHECK: %[[buf17:.*]] = aie.buffer(%[[tile_2_1]]) {sym_name = "buf17"} : memref<64x256xbf16, 1> 
+// CHECK: %[[buf16:.*]] = aie.buffer(%[[tile_3_1]]) {sym_name = "buf16"} : memref<64x256xbf16, 1> 
+// CHECK: %[[buf15:.*]] = aie.buffer(%[[tile_3_5]]) {sym_name = "buf15"} : memref<16x16x4x4xbf16, 2> 
+// CHECK: %[[buf14:.*]] = aie.buffer(%[[tile_2_5]]) {sym_name = "buf14"} : memref<16x16x4x4xbf16, 2> 
+// CHECK: %[[buf13:.*]] = aie.buffer(%[[tile_1_5]]) {sym_name = "buf13"} : memref<16x16x4x4xbf16, 2> 
+// CHECK: %[[buf12:.*]] = aie.buffer(%[[tile_0_5]]) {sym_name = "buf12"} : memref<16x16x4x4xbf16, 2> 
+// CHECK: %[[buf11:.*]] = aie.buffer(%[[tile_3_4]]) {sym_name = "buf11"} : memref<16x16x4x4xbf16, 2> 
+// CHECK: %[[buf10:.*]] = aie.buffer(%[[tile_2_4]]) {sym_name = "buf10"} : memref<16x16x4x4xbf16, 2> 
+// CHECK: %[[buf9:.*]] = aie.buffer(%[[tile_1_4]]) {sym_name = "buf9"} : memref<16x16x4x4xbf16, 2> 
+// CHECK: %[[buf8:.*]] = aie.buffer(%[[tile_0_4]]) {sym_name = "buf8"} : memref<16x16x4x4xbf16, 2> 
+// CHECK: %[[buf7:.*]] = aie.buffer(%[[tile_3_3]]) {sym_name = "buf7"} : memref<16x16x4x4xbf16, 2> 
+// CHECK: %[[buf6:.*]] = aie.buffer(%[[tile_2_3]]) {sym_name = "buf6"} : memref<16x16x4x4xbf16, 2> 
+// CHECK: %[[buf5:.*]] = aie.buffer(%[[tile_1_3]]) {sym_name = "buf5"} : memref<16x16x4x4xbf16, 2> 
+// CHECK: %[[buf4:.*]] = aie.buffer(%[[tile_0_3]]) {sym_name = "buf4"} : memref<16x16x4x4xbf16, 2> 
+// CHECK: %[[buf3:.*]] = aie.buffer(%[[tile_3_2]]) {sym_name = "buf3"} : memref<16x16x4x4xbf16, 2> 
+// CHECK: %[[buf2:.*]] = aie.buffer(%[[tile_2_2]]) {sym_name = "buf2"} : memref<16x16x4x4xbf16, 2> 
+// CHECK: %[[buf1:.*]] = aie.buffer(%[[tile_1_2]]) {sym_name = "buf1"} : memref<16x16x4x4xbf16, 2> 
+// CHECK: %[[buf0:.*]] = aie.buffer(%[[tile_0_2]]) {sym_name = "buf0"} : memref<16x16x4x4xbf16, 2> 
 // CHECK: aie.core(%[[tile_3_5]])
 // CHECK: aie.core(%[[tile_2_5]])
 // CHECK: aie.core(%[[tile_1_5]])
@@ -806,30 +804,34 @@ func.func @func11(%arg0: memref<128xbf16>, %arg1: memref<128xbf16>) {
 // CHECK: aie.core(%[[tile_2_3]])
 // CHECK: aie.core(%[[tile_1_3]])
 // CHECK: aie.core(%[[tile_0_3]])
+// CHECK: aie.core(%[[tile_3_2]])
+// CHECK: aie.core(%[[tile_2_2]])
+// CHECK: aie.core(%[[tile_1_2]])
+// CHECK: aie.core(%[[tile_0_2]])
+// CHECK: aie.flow(%[[tile_0_1]], DMA : 0, %[[tile_0_0]], DMA : 0)
+// CHECK: aie.flow(%[[tile_1_1]], DMA : 0, %[[tile_1_0]], DMA : 0)
 // CHECK: aie.flow(%[[tile_2_1]], DMA : 0, %[[tile_2_0]], DMA : 0)
 // CHECK: aie.flow(%[[tile_3_1]], DMA : 0, %[[tile_3_0]], DMA : 0)
-// CHECK: aie.flow(%[[tile_4_1]], DMA : 0, %[[tile_2_0]], DMA : 1)
-// CHECK: aie.flow(%[[tile_5_1]], DMA : 0, %[[tile_3_0]], DMA : 1)
-// CHECK: aie.flow(%[[tile_0_3]], DMA : 0, %[[tile_2_1]], DMA : 0)
-// CHECK: aie.flow(%[[tile_0_4]], DMA : 0, %[[tile_2_1]], DMA : 1)
-// CHECK: aie.flow(%[[tile_0_5]], DMA : 0, %[[tile_2_1]], DMA : 2)
-// CHECK: aie.flow(%[[tile_0_6]], DMA : 0, %[[tile_2_1]], DMA : 3)
-// CHECK: aie.flow(%[[tile_1_3]], DMA : 0, %[[tile_3_1]], DMA : 0)
-// CHECK: aie.flow(%[[tile_1_4]], DMA : 0, %[[tile_3_1]], DMA : 1)
-// CHECK: aie.flow(%[[tile_1_5]], DMA : 0, %[[tile_3_1]], DMA : 2)
-// CHECK: aie.flow(%[[tile_1_6]], DMA : 0, %[[tile_3_1]], DMA : 3)
-// CHECK: aie.flow(%[[tile_2_3]], DMA : 0, %[[tile_3_1]], DMA : 4)
-// CHECK: aie.flow(%[[tile_2_4]], DMA : 0, %[[tile_3_1]], DMA : 5)
-// CHECK: aie.flow(%[[tile_2_5]], DMA : 0, %[[tile_3_1]], DMA : 0)
-// CHECK: aie.flow(%[[tile_2_6]], DMA : 0, %[[tile_3_1]], DMA : 0)
-// CHECK: aie.flow(%[[tile_3_3]], DMA : 0, %[[tile_3_1]], DMA : 0)
-// CHECK: aie.flow(%[[tile_3_4]], DMA : 0, %[[tile_3_1]], DMA : 0)
-// CHECK: aie.flow(%[[tile_3_5]], DMA : 0, %[[tile_3_1]], DMA : 0)
-// CHECK: aie.flow(%[[tile_3_6]], DMA : 0, %[[tile_3_1]], DMA : 0)
+// CHECK: aie.flow(%[[tile_0_2]], DMA : 0, %[[tile_0_1]], DMA : 0)
+// CHECK: aie.flow(%[[tile_0_3]], DMA : 0, %[[tile_0_1]], DMA : 1)
+// CHECK: aie.flow(%[[tile_0_4]], DMA : 0, %[[tile_0_1]], DMA : 2)
+// CHECK: aie.flow(%[[tile_0_5]], DMA : 0, %[[tile_0_1]], DMA : 3)
+// CHECK: aie.flow(%[[tile_1_2]], DMA : 0, %[[tile_1_1]], DMA : 0)
+// CHECK: aie.flow(%[[tile_1_3]], DMA : 0, %[[tile_1_1]], DMA : 1)
+// CHECK: aie.flow(%[[tile_1_4]], DMA : 0, %[[tile_1_1]], DMA : 2)
+// CHECK: aie.flow(%[[tile_1_5]], DMA : 0, %[[tile_1_1]], DMA : 3)
+// CHECK: aie.flow(%[[tile_2_2]], DMA : 0, %[[tile_1_1]], DMA : 4)
+// CHECK: aie.flow(%[[tile_2_3]], DMA : 0, %[[tile_1_1]], DMA : 5)
+// CHECK: aie.flow(%[[tile_2_4]], DMA : 0, %[[tile_1_1]], DMA : 0)
+// CHECK: aie.flow(%[[tile_2_5]], DMA : 0, %[[tile_1_1]], DMA : 0)
+// CHECK: aie.flow(%[[tile_3_2]], DMA : 0, %[[tile_1_1]], DMA : 0)
+// CHECK: aie.flow(%[[tile_3_3]], DMA : 0, %[[tile_1_1]], DMA : 0)
+// CHECK: aie.flow(%[[tile_3_4]], DMA : 0, %[[tile_1_1]], DMA : 0)
+// CHECK: aie.flow(%[[tile_3_5]], DMA : 0, %[[tile_1_1]], DMA : 0)
+// CHECK: aie.memtile_dma(%[[tile_0_1]])
+// CHECK: aie.memtile_dma(%[[tile_1_1]])
 // CHECK: aie.memtile_dma(%[[tile_2_1]])
 // CHECK: aie.memtile_dma(%[[tile_3_1]])
-// CHECK: aie.memtile_dma(%[[tile_4_1]])
-// CHECK: aie.memtile_dma(%[[tile_5_1]])
 // CHECK: @func12
 
 #map = affine_map<()[s0] -> (s0 * 256)>
@@ -866,7 +868,7 @@ module {
       %7 = affine.apply #map3()[%arg3]
       %8 = air.channel.get async [%async_token]  @channel_3[] (%arg7[%7, %results] [%c64, %c256] [%c512, %c1]) {id = 6 : i32} : (memref<512x512xbf16>)
       %9 = air.wait_all async [%2, %4, %6, %8] 
-      %10 = air.segment @segment_0 async  attributes {id = 2 : i32, x_loc = 0 : i64, x_size = 4 : i64, y_loc = 3 : i64, y_size = 4 : i64} {
+      %10 = air.segment @segment_0 async  attributes {id = 2 : i32, x_loc = 0 : i64, x_size = 4 : i64, y_loc = 2 : i64, y_size = 4 : i64} {
         %c3_1 = arith.constant 3 : index
         %c2_2 = arith.constant 2 : index
         %c192 = arith.constant 192 : index
@@ -909,7 +911,7 @@ module {
         %33 = air.channel.get async [%async_token_7]  @channel_10[%c3_1, %c2_2] (%results_6[%c0_5, %c128] [%c64_3, %c64_3] [%c256_6, %c1_4]) {id = 27 : i32} : (memref<64x256xbf16, 1>)
         %34 = air.channel.get async [%async_token_7]  @channel_10[%c3_1, %c3_1] (%results_6[%c0_5, %c192] [%c64_3, %c64_3] [%c256_6, %c1_4]) {id = 27 : i32} : (memref<64x256xbf16, 1>)
         %async_token_8 = air.wait_all async [%async_token_4, %async_token_5, %async_token_6, %async_token_7]
-        %12 = air.herd @herd_0 async [%async_token_8]  tile (%arg8, %arg9) in (%arg10=%c4, %arg11=%c4) attributes {id = 3 : i32, link_with = "mm.o", x_loc = 0 : i64, y_loc = 3 : i64} {
+        %12 = air.herd @herd_0 async [%async_token_8]  tile (%arg8, %arg9) in (%arg10=%c4, %arg11=%c4) attributes {id = 3 : i32, link_with = "mm.o", x_loc = 0 : i64, y_loc = 2 : i64} {
           %c64_10 = arith.constant 64 : index
           %c256_11 = arith.constant 256 : index
           %c4_12 = arith.constant 4 : index
@@ -951,12 +953,12 @@ module {
 // -----
 
 // Wrap-and-stride list canonicalization during herd outlining.
-// CHECK: aie.device(xcve2802)
-// CHECK: %[[tile_2_0:.*]] = aie.tile(2, 0)
-// CHECK: %[[tile_2_1:.*]] = aie.tile(2, 1)
-// CHECK: %[[tile_2_3:.*]] = aie.tile(2, 3)
+// CHECK: aie.device(npu1_4col)
+// CHECK: %[[tile_2_0:.*]] = aie.tile(0, 0)
+// CHECK: %[[tile_2_1:.*]] = aie.tile(0, 1)
+// CHECK: %[[tile_2_3:.*]] = aie.tile(0, 2)
 // CHECK:  %[[VAL_0:.*]] = aie.mem(%[[tile_2_3]]) {
-// CHECK:    %[[VAL_1:.*]] = aie.dma_start(MM2S, 0, ^bb1, ^bb2, repeat_count = 1)
+// CHECK:    %[[VAL_1:.*]] = aie.dma_start(MM2S, 0, ^bb1, ^bb2)
 // CHECK:  ^bb1:
 // CHECK:    aie.use_lock(%{{.*}}, AcquireGreaterEqual, 1)
 // CHECK:    aie.dma_bd(%{{.*}} : memref<1x1x16x16x4x4xf32, 2 : i32>, 0, 4096, [<size = 64, stride = 4>, <size = 16, stride = 256>, <size = 4, stride = 1>])
@@ -1030,24 +1032,24 @@ module {
 // -----
 
 // Unrolled bundle of channels from shim accessing directly to herd.
-// CHECK: aie.device(xcve2802)
-// CHECK: %[[tile_2_0:.*]] = aie.tile(2, 0)
-// CHECK: %[[tile_3_0:.*]] = aie.tile(3, 0)
-// CHECK: %[[tile_2_3:.*]] = aie.tile(2, 3)
-// CHECK: %[[tile_3_3:.*]] = aie.tile(3, 3)
-// CHECK: %[[tile_2_4:.*]] = aie.tile(2, 4)
-// CHECK: %[[tile_3_4:.*]] = aie.tile(3, 4)
-// CHECK: aie.flow(%[[tile_2_0]], DMA : 0, %[[tile_2_3]], DMA : 0)
-// CHECK: aie.flow(%[[tile_3_0]], DMA : 0, %[[tile_3_3]], DMA : 0)
-// CHECK: aie.flow(%[[tile_2_0]], DMA : 1, %[[tile_2_4]], DMA : 0)
-// CHECK: aie.flow(%[[tile_3_0]], DMA : 1, %[[tile_3_4]], DMA : 0)
-// CHECK: aie.shim_dma_allocation @airMemcpyId9(MM2S, 0, 2)
+// CHECK: aie.device(npu1_4col)
+// CHECK: %[[tile_0_0:.*]] = aie.tile(0, 0)
+// CHECK: %[[tile_1_0:.*]] = aie.tile(1, 0)
+// CHECK: %[[tile_0_2:.*]] = aie.tile(0, 2)
+// CHECK: %[[tile_1_2:.*]] = aie.tile(1, 2)
+// CHECK: %[[tile_0_3:.*]] = aie.tile(0, 3)
+// CHECK: %[[tile_1_3:.*]] = aie.tile(1, 3)
+// CHECK: aie.flow(%[[tile_0_0]], DMA : 0, %[[tile_0_2]], DMA : 0)
+// CHECK: aie.flow(%[[tile_1_0]], DMA : 0, %[[tile_1_2]], DMA : 0)
+// CHECK: aie.flow(%[[tile_0_0]], DMA : 1, %[[tile_0_3]], DMA : 0)
+// CHECK: aie.flow(%[[tile_1_0]], DMA : 1, %[[tile_1_3]], DMA : 0)
+// CHECK: aie.shim_dma_allocation @airMemcpyId9(MM2S, 0, 0)
 // CHECK: memref.global "public" @airMemcpyId9 : memref<16x8xi32, 2 : i32>
-// CHECK: aie.shim_dma_allocation @airMemcpyId9_1(MM2S, 0, 3)
+// CHECK: aie.shim_dma_allocation @airMemcpyId9_1(MM2S, 0, 1)
 // CHECK: memref.global "public" @airMemcpyId9_1 : memref<16x8xi32, 2 : i32>
-// CHECK: aie.shim_dma_allocation @airMemcpyId9_2(MM2S, 1, 2)
+// CHECK: aie.shim_dma_allocation @airMemcpyId9_2(MM2S, 1, 0)
 // CHECK: memref.global "public" @airMemcpyId9_2 : memref<16x8xi32, 2 : i32>
-// CHECK: aie.shim_dma_allocation @airMemcpyId9_3(MM2S, 1, 3)
+// CHECK: aie.shim_dma_allocation @airMemcpyId9_3(MM2S, 1, 1)
 // CHECK: memref.global "public" @airMemcpyId9_3 : memref<16x8xi32, 2 : i32>
 // CHECK: func.func @func14
 // CHECK: air.channel.put  @channel_0{{.*}} metadata = @airMemcpyId9} : (memref<32x16xi32>)
@@ -1087,7 +1089,7 @@ module {
 // Ensure redundant shim DMA allocations do not occur
 //
 // CHECK:         aie.flow
-// CHECK-NEXT: aie.shim_dma_allocation @airMemcpyId2(MM2S, 0, 2)
+// CHECK-NEXT: aie.shim_dma_allocation @airMemcpyId2(MM2S, 0, 0)
 // CHECK-NEXT: memref.global "public" @airMemcpyId2 : memref<1024xi32, 1>
 // CHECK: @func15
 air.channel @channel_2 [1, 1]
@@ -1109,6 +1111,124 @@ func.func @func15(%arg0 : memref<1024xi32>, %arg1 : memref<1024xi32>) -> () {
     air.herd tile(%tx, %ty) in (%size_x = %herd_cols, %size_y = %herd_rows) attributes { sym_name="herd4"} {
       %buf0 = memref.alloc() : memref<1024xi32, 2>
       memref.dealloc %buf0 : memref<1024xi32, 2>
+    }
+  }
+  return
+}
+
+// -----
+
+// Lowering complex loop structures around channel.puts/gets into BD task repeat counts (aie.mem).
+//
+// CHECK:      aie.mem
+// CHECK-NEXT: aie.dma_start(S2MM, 0, ^bb1, ^bb3)
+// CHECK-NEXT: ^bb1:
+// CHECK:      aie.dma_bd({{.*}}) {task_id = 0 : i32}
+// CHECK:      aie.next_bd ^bb2
+// CHECK-NEXT: ^bb2:
+// CHECK-NEXT: aie.end
+// CHECK-NEXT: ^bb3:
+// CHECK-NEXT: aie.dma_start(S2MM, 0, ^bb4, ^bb2, repeat_count = 7)
+// CHECK:      aie.dma_bd({{.*}}) {task_id = 1 : i32}
+// CHECK:      aie.next_bd ^bb2
+// CHECK:      @func16
+
+air.channel @channel_0 [1, 1]
+air.channel @channel_1 [1, 1]
+func.func @func16(%arg0 : memref<5xi32>, %arg1 : memref<96xi32>, %arg2 : memref<9xi32>, %ub : index) -> () {
+  %c0 = arith.constant 0 : index
+  %c1 = arith.constant 1 : index
+  %c8 = arith.constant 8 : index
+  %c12 = arith.constant 12 : index
+  air.channel.put @channel_0[] (%arg0[] [] []) {id = 1 : i32} : (memref<5xi32>)
+  scf.for %arg3 = %c0 to %c8 step %c1 {
+    air.channel.put @channel_0[] (%arg1[] [] []) {id = 2 : i32} : (memref<96xi32>)
+  }
+  air.segment @segment0 args (%ub_seg=%ub) : index {
+    %c0_0 = arith.constant 0 : index
+    %c1_0 = arith.constant 1 : index
+    %c8_0 = arith.constant 8 : index
+    %c12_0 = arith.constant 12 : index
+    %herd_cols = arith.constant 1 : index
+    %herd_rows = arith.constant 1 : index
+    %tok_5 = air.herd async tile(%tx, %ty) in (%size_x = %herd_cols, %size_y = %herd_rows) args (%ub_herd=%ub_seg) : index attributes { sym_name="herd4"} {
+      %c0_1 = arith.constant 0 : index
+      %c1_1 = arith.constant 1 : index
+      %c8_1 = arith.constant 8 : index
+      %c12_1 = arith.constant 12 : index
+      %buf0 = memref.alloc() : memref<5xi32, 2>
+      %tok_6 = air.channel.get async @channel_0[] (%buf0[] [] []) {id = 7 : i32} : (memref<5xi32, 2>)
+      %tok_7 = scf.for %arg5 = %c0_1 to %c8_1 step %c1_1 iter_args(%arg14 = %tok_6) -> (!air.async.token) {
+        %buf1 = memref.alloc() : memref<96xi32, 2>
+        %tok_5 = air.channel.get async [%arg14] @channel_0[] (%buf1[] [] []) {id = 8 : i32} : (memref<96xi32, 2>)
+        memref.dealloc %buf1 : memref<96xi32, 2>
+        scf.yield %tok_5 : !air.async.token
+      }
+      memref.dealloc %buf0 : memref<5xi32, 2>
+    }
+  }
+  return
+}
+
+// -----
+
+// Lowering complex loop structures around channel.puts/gets into BD task repeat counts (aie.memtile_dma).
+//
+// CHECK:      aie.memtile_dma
+// CHECK-NEXT: aie.dma_start(S2MM, 0, ^bb1, ^bb7)
+// CHECK-NEXT: ^bb1:
+// CHECK:      aie.dma_bd({{.*}}) {task_id = 0 : i32}
+// CHECK:      aie.next_bd ^bb2
+// CHECK-NEXT: ^bb2:
+// CHECK-NEXT: aie.end
+// CHECK-NEXT: ^bb3:
+// CHECK-NEXT: aie.dma_start(S2MM, 0, ^bb4, ^bb2, repeat_count = 7)
+// CHECK:      aie.dma_bd({{.*}}) {task_id = 1 : i32}
+// CHECK:      aie.next_bd ^bb2
+// CHECK: @func17
+air.channel @channel_0 [1, 1]
+air.channel @channel_1 [1, 1]
+func.func @func17(%arg0 : memref<5xi32>, %arg1 : memref<96xi32>, %arg2 : memref<9xi32>, %ub : index) -> () {
+  %c0 = arith.constant 0 : index
+  %c1 = arith.constant 1 : index
+  %c8 = arith.constant 8 : index
+  %c12 = arith.constant 12 : index
+  air.channel.put @channel_0[] (%arg0[] [] []) {id = 1 : i32} : (memref<5xi32>)
+  scf.for %arg3 = %c0 to %c8 step %c1 {
+    air.channel.put @channel_0[] (%arg1[] [] []) {id = 2 : i32} : (memref<96xi32>)
+  }
+  air.segment @segment0 args (%ub_seg=%ub) : index {
+    %c0_0 = arith.constant 0 : index
+    %c1_0 = arith.constant 1 : index
+    %c8_0 = arith.constant 8 : index
+    %c12_0 = arith.constant 12 : index
+    %herd_cols = arith.constant 1 : index
+    %herd_rows = arith.constant 1 : index
+    %memtile0 = memref.alloc() : memref<5xi32, 1>
+    %tok_0 = air.channel.get async @channel_0[] (%memtile0[] [] []) {id = 3 : i32} : (memref<5xi32, 1>)
+    %tok_1 = air.channel.put async [%tok_0] @channel_1[] (%memtile0[] [] []) {id = 4 : i32} : (memref<5xi32, 1>)
+    %tok_2 = scf.for %arg4 = %c0_0 to %c8_0 step %c1_0 iter_args(%arg14 = %tok_1) -> (!air.async.token) {
+      %memtile1 = memref.alloc() : memref<96xi32, 1>
+      %tok_3 = air.channel.get async [%arg14] @channel_0[] (%memtile1[] [] []) {id = 5 : i32} : (memref<96xi32, 1>)
+      %tok_4 = air.channel.put async [%tok_3] @channel_1[] (%memtile1[] [] []) {id = 6 : i32} : (memref<96xi32, 1>)
+      memref.dealloc %memtile1 : memref<96xi32, 1>
+      scf.yield %tok_4 : !air.async.token
+    }
+    memref.dealloc %memtile0 : memref<5xi32, 1>
+    %tok_5 = air.herd async tile(%tx, %ty) in (%size_x = %herd_cols, %size_y = %herd_rows) args (%ub_herd=%ub_seg) : index attributes { sym_name="herd4"} {
+      %c0_1 = arith.constant 0 : index
+      %c1_1 = arith.constant 1 : index
+      %c8_1 = arith.constant 8 : index
+      %c12_1 = arith.constant 12 : index
+      %buf0 = memref.alloc() : memref<5xi32, 2>
+      %tok_6 = air.channel.get async @channel_1[] (%buf0[] [] []) {id = 7 : i32} : (memref<5xi32, 2>)
+      %tok_7 = scf.for %arg5 = %c0_1 to %c8_1 step %c1_1 iter_args(%arg14 = %tok_6) -> (!air.async.token) {
+        %buf1 = memref.alloc() : memref<96xi32, 2>
+        %tok_5 = air.channel.get async [%arg14] @channel_1[] (%buf1[] [] []) {id = 8 : i32} : (memref<96xi32, 2>)
+        memref.dealloc %buf1 : memref<96xi32, 2>
+        scf.yield %tok_5 : !air.async.token
+      }
+      memref.dealloc %buf0 : memref<5xi32, 2>
     }
   }
   return

@@ -9,6 +9,7 @@
 #include "air/Util/Util.h"
 #include "air/Dialect/AIR/AIRDialect.h"
 
+#include "mlir/Analysis/SliceAnalysis.h"
 #include "mlir/Dialect/Affine/IR/AffineOps.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/Linalg/IR/Linalg.h"
@@ -760,10 +761,10 @@ std::vector<unsigned>
 air::convertVecOfConstIndexToVecOfUInt(SmallVector<Value> svec) {
   std::vector<unsigned> output;
   for (auto v : svec) {
-    auto op = v.getDefiningOp<arith::ConstantIndexOp>();
-    if (!op)
+    auto constOp = getConstantIntValue(v);
+    if (!constOp)
       return std::vector<unsigned>();
-    output.push_back(op.value());
+    output.push_back(*constOp);
   }
   return output;
 }
@@ -840,6 +841,24 @@ LogicalResult eraseWrapNStrideDim(OpBuilder builder,
         builder.getUnknownLoc(), (*const_size) * (*const_size_next));
     return true;
   };
+  // For a given offset[i], find the first offset[j] such that stride[j] is
+  // divisible by stride[i], so that offset[i] can be composed onto offset[j].
+  auto findFirstComposableOffsetIdx = [](int i, SmallVector<Value> offsets,
+                                         SmallVector<Value> strides) {
+    auto constStrideI = getConstantIntValue(strides[i]);
+    std::optional<int> output = std::nullopt;
+    for (int j = i + 1; j < (int)strides.size(); j++) {
+      if (!getConstantIntValue(offsets[j]))
+        continue; // Currently unable to compose offset[i] expr onto another
+                  // offset[j] expr.
+      auto constStrideJ = getConstantIntValue(strides[j]);
+      if ((*constStrideI) % (*constStrideJ) == 0) {
+        output = j;
+        return output;
+      }
+    }
+    return output;
+  };
   for (auto i : erase_dims) {
     auto const_offset = getConstantIntValue(offsets[i]);
     if (const_offset && *const_offset == 0) {
@@ -855,13 +874,14 @@ LogicalResult eraseWrapNStrideDim(OpBuilder builder,
       continue;
     auto const_stride = getConstantIntValue(strides[i]);
     assert(const_stride && "non-static stride, NYI.");
-    auto const_offset_next = getConstantIntValue(offsets[i + 1]);
-    if (!const_offset_next)
+    auto j = findFirstComposableOffsetIdx(i, offsets, strides);
+    if (!j)
       continue;
-    auto const_stride_next = getConstantIntValue(strides[i + 1]);
-    assert(const_stride_next && "non-static stride, NYI.");
+    auto const_offset_next = getConstantIntValue(offsets[*j]);
+    auto const_stride_next = getConstantIntValue(strides[*j]);
+    // Attempting to compose i-th offset onto another offset.
     if (const_offset) {
-      offsets[i + 1] = builder.create<arith::ConstantIndexOp>(
+      offsets[*j] = builder.create<arith::ConstantIndexOp>(
           builder.getUnknownLoc(),
           (*const_stride) * (*const_offset) / (*const_stride_next) +
               (*const_offset_next));
@@ -912,7 +932,7 @@ LogicalResult eraseWrapNStrideDim(OpBuilder builder,
       auto next_offset_map = AffineMap::get(0, 1, offset_expr);
       affine_apply.setMap(next_offset_map);
       offsets[i] = affine_apply;
-      offsets[i + 1] = offsets[i];
+      offsets[*j] = offsets[i];
     }
     erased |= multiplyAdjWraps(builder, i, sizes);
     offsets.erase(offsets.begin() + i);
@@ -1028,7 +1048,14 @@ LogicalResult air::foldForLoopNestAsExtendedSizesAndStrides(
     }
   }
 
-  std::map<Operation *, int> op_to_count;
+  // Evaluate offset from affine map.
+  auto evalOffsetFromAffineMap = [&](MLIRContext *ctx, AffineMap map) {
+    SmallVector<std::optional<int64_t>> zeroSyms(map.getNumSymbols(),
+                                                 std::optional<int64_t>{0});
+    SmallVector<std::optional<int64_t>> zeroDims(map.getNumDims(),
+                                                 std::optional<int64_t>{0});
+    return air::evaluateConstantsInMap(map, zeroSyms, zeroDims, ctx);
+  };
   for (auto o : for_loops) {
     int64_t stepSize = -1;
     int loop_lower_bound = 0;
@@ -1045,58 +1072,49 @@ LogicalResult air::foldForLoopNestAsExtendedSizesAndStrides(
     }
     int64_t ind_var_factor = 0;
     for (int i = offsets.size() - 1; i >= 0; i--) {
-      if (iv && offsets[i] == iv) {
+      Value offsetVal = offsets[i];
+      // Propagate through cast op
+      if (auto cast = offsetVal.getDefiningOp<CastOpInterface>()) {
+        if (cast->getNumOperands() == 1)
+          offsetVal = cast->getOperand(0);
+      }
+      if (iv && offsetVal == iv) {
         ind_var_factor = *getConstantIntValue(strides[i]);
         offsets[i] = builder.template create<arith::ConstantIndexOp>(
             loc, loop_lower_bound);
         break;
-      } else if (iv && offsets[i].getDefiningOp()) {
-        Operation *iv_consumer = offsets[i].getDefiningOp();
+      } else if (iv && offsetVal.getDefiningOp()) {
+        Operation *iv_consumer = offsetVal.getDefiningOp();
         if (auto exec = dyn_cast<air::ExecuteOp>(iv_consumer))
           iv_consumer = &exec.getChildOps().front();
         if (auto affop = dyn_cast<affine::AffineApplyOp>(iv_consumer)) {
-          // The induction variable must be the input to the affine op
-          if (affop.getSymbolOperands().size() == 1) {
-            bool iv_is_symbol = false;
-            for (auto val : affop.getSymbolOperands()) {
-              if (val == iv) {
-                iv_is_symbol = true;
-                break;
-              }
-            }
-            if (iv_is_symbol) {
-              auto map = affop.getAffineMap();
-              ind_var_factor = *getConstantIntValue(strides[i]);
-              ind_var_factor *= air::evaluateConstantsInMap(
-                                    map,
-                                    SmallVector<std::optional<int64_t>>{
-                                        std::optional<int64_t>{stepSize}},
-                                    for_op->getContext())
-                                    .value();
-              offsets[i] = builder.template create<arith::ConstantIndexOp>(
-                  loc, loop_lower_bound);
-              break;
-            }
+          auto idx = llvm::find_if(affop.getOperands(),
+                                   [iv](Value oper) { return oper == iv; });
+          if (idx != affop.getOperands().end()) {
+            auto map = affop.getAffineMap();
+            int64_t map_offset =
+                evalOffsetFromAffineMap(for_op->getContext(), map).value();
+            ind_var_factor = *getConstantIntValue(strides[i]);
+            SmallVector<std::optional<int64_t>> stepSizeAsSymVec(
+                affop.getMap().getNumSymbols(), std::optional<int64_t>{0});
+            SmallVector<std::optional<int64_t>> stepSizeAsDimVec(
+                affop.getMap().getNumDims(), std::optional<int64_t>{0});
+            if (idx - affop.getOperands().begin() < affop.getMap().getNumDims())
+              stepSizeAsDimVec[idx - affop.getOperands().begin()] = stepSize;
+            else
+              stepSizeAsSymVec[idx - affop.getOperands().begin() -
+                               affop.getMap().getNumDims()] = stepSize;
+            int64_t map_gradient = air::evaluateConstantsInMap(
+                                       map, stepSizeAsSymVec, stepSizeAsDimVec,
+                                       for_op->getContext())
+                                       .value() -
+                                   map_offset;
+            ind_var_factor *= map_gradient;
           }
         }
-        if (llvm::is_contained(iv_consumer->getOperands(), iv)) {
-          if (op_to_count.find(iv_consumer) == op_to_count.end()) {
-            op_to_count[iv_consumer] = 0;
-            for (auto operand : iv_consumer->getOperands()) {
-              for (auto iv_val : ivs) {
-                if (iv_val == operand)
-                  op_to_count[iv_consumer]++;
-              }
-            }
-          }
-          op_to_count[iv_consumer]--;
-          ind_var_factor = *getConstantIntValue(strides[i]);
-          if (!op_to_count[iv_consumer]) {
-            offsets[i] = builder.template create<arith::ConstantIndexOp>(
-                loc, loop_lower_bound);
-          }
-          break;
-        }
+        iv_consumer->replaceUsesOfWith(
+            iv, builder.template create<arith::ConstantIndexOp>(
+                    loc, loop_lower_bound));
       }
     }
     int trip_count = -1;
@@ -1564,20 +1582,27 @@ air::getOffsetDimFromMemrefDim(int dimOnMemref, SmallVector<Value> strides,
 
 // Evaluate the affine expression of affine map on a sparse vector of constant
 // ints.
-std::optional<int64_t>
-air::evaluateConstantsInMap(AffineMap map,
-                            SmallVector<std::optional<int64_t>> const_inputs,
-                            MLIRContext *ctx) {
+std::optional<int64_t> air::evaluateConstantsInMap(
+    AffineMap map, SmallVector<std::optional<int64_t>> symbolInputs,
+    SmallVector<std::optional<int64_t>> dimInputs, MLIRContext *ctx) {
   std::optional<int64_t> output = std::nullopt;
-  if (map.getNumInputs() != const_inputs.size())
+  if (map.getNumSymbols() != symbolInputs.size())
+    return output;
+  if (map.getNumDims() != dimInputs.size())
     return output;
   auto newmap = map;
   for (unsigned i = 0; i < map.getNumSymbols(); i++) {
-    if (!const_inputs[i])
+    if (!symbolInputs[i])
       continue;
-    auto c = getAffineConstantExpr(*const_inputs[i], ctx);
+    auto c = getAffineConstantExpr(*symbolInputs[i], ctx);
     newmap =
         newmap.replace(getAffineSymbolExpr(i, ctx), c, 0, map.getNumSymbols());
+  }
+  for (unsigned i = 0; i < map.getNumDims(); i++) {
+    if (!dimInputs[i])
+      continue;
+    auto c = getAffineConstantExpr(*dimInputs[i], ctx);
+    newmap = newmap.replace(getAffineDimExpr(i, ctx), c, map.getNumDims(), 0);
   }
   output = simplifyAffineMap(newmap).getSingleConstantResult();
   return output;
@@ -1612,4 +1637,60 @@ bool air::isPure(Operation *op) {
       return mlir::isPure(&childOp);
     });
   return result;
+}
+
+// Return if the given block contains N ops which are impure and aren't async
+// wait ops (such as air.wait_all).
+bool air::hasNImpureOps(Block *block, unsigned N) {
+  unsigned counter = 0;
+  for (auto &o : block->without_terminator()) {
+    if (air::isPure(&o))
+      continue;
+    if (isa<air::WaitAllOp>(o))
+      continue;
+    counter++;
+  }
+  return counter == N;
+}
+
+// Return if the given block contains N ops or not, not counting the block's
+// terminator.
+bool air::hasNElements(Block *block, unsigned N) {
+  // unsigned counter = 0;
+  // for (auto &o : block->without_terminator())
+  //   counter++;
+  return llvm::range_size(block->without_terminator()) == N;
+}
+
+// Clone backward slices of a list of values.
+SmallVector<Operation *>
+air::cloneDefiningOpsInRegion(OpBuilder builder, Region *region,
+                              SmallVectorImpl<Value> &opers, IRMapping &remap) {
+  SmallVector<Operation *> clonedOps;
+  SetVector<Operation *> backwardSlices;
+  BackwardSliceOptions bsOptions{
+      [&](Operation *o) { return region->isAncestor(o->getParentRegion()); }};
+  if (!region)
+    return clonedOps;
+  for (auto operand : opers) {
+    auto operandDefOp = operand.getDefiningOp();
+    if (!operandDefOp)
+      continue;
+    if (!region->isAncestor(operandDefOp->getParentRegion()))
+      continue;
+    assert(air::isPure(operandDefOp) ||
+           isa<air::WaitAllOp>(operandDefOp)); // Pure ops and wait ops are
+                                               // safe to hoist out of loops.
+    // Get backward slices
+    SetVector<Operation *> operandBS;
+    getBackwardSlice(operandDefOp, &operandBS, bsOptions);
+    for (auto b : operandBS) {
+      assert(air::isPure(b) || isa<air::WaitAllOp>(b));
+      backwardSlices.insert(b);
+    }
+    backwardSlices.insert(operandDefOp);
+  }
+  for (auto op : backwardSlices)
+    clonedOps.push_back(builder.clone(*op, remap));
+  return clonedOps;
 }
