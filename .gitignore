@@ -36,3 +36,6 @@ sandbox
 libadf.a
 *.elf
 *.elf.*
+
+install-pcie/
+build-pcie/
