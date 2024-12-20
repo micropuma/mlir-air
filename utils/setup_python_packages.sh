@@ -17,3 +17,4 @@ virtualenv sandbox
 source sandbox/bin/activate
 python3 -m pip install --upgrade pip
 python3 -m pip install -r utils/requirements.txt
+HOST_MLIR_PYTHON_PACKAGE_PREFIX=aie python3 -m pip install -r utils/requirements_extras.txt

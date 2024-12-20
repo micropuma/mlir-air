@@ -1,5 +1,7 @@
 PyYAML>=5.3.1, <=6.0.1
 aiofiles
+cmake>=3.29
+dataclasses>=0.6, <=0.8
 filelock==3.13.1
 lit
 joblib
@@ -8,5 +10,9 @@ psutil
 rich
 pybind11
 numpy<2
-cmake
 bfloat16
+pandas
+setuptools
+wheel
+ml_dtypes
+numpy>=1.19.5, <=1.26 # 2.1 would be nice for typing improvements, but it doesn't seem to work well with pyxrt
