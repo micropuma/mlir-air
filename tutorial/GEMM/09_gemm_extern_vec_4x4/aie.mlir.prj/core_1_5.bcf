@@ -1,0 +1,80 @@
+_entry_point _main_init
+_symbol core_1_5 _after _main_init
+_symbol _main_init 0
+_reserved DMb 0x00000 0x40000 // Don't put data in code memory
+_stack DM_stack 0x70000 0x400 // stack for core
+
+// mapping neighbors tile memory
+// south -------------------------------------------------
+_reserved DMb 0x40000 0x10000  // Don't allocate variables in south neighbor
+
+_symbol buf49 0x40400 8192
+_extern buf49
+_reserved DMb 0x40400 8192
+
+_symbol buf48 0x44000 8192
+_extern buf48
+_reserved DMb 0x44000 8192
+
+_symbol buf47 0x48000 8192
+_extern buf47
+_reserved DMb 0x48000 8192
+
+_symbol buf46 0x4C000 8192
+_extern buf46
+_reserved DMb 0x4C000 8192
+
+_symbol buf45 0x46000 8192
+_extern buf45
+_reserved DMb 0x46000 8192
+
+// west -------------------------------------------------
+_reserved DMb 0x50000 0x10000  // Don't allocate variables in west neighbor
+
+_symbol buf64 0x50400 8192
+_extern buf64
+_reserved DMb 0x50400 8192
+
+_symbol buf63 0x54000 8192
+_extern buf63
+_reserved DMb 0x54000 8192
+
+_symbol buf62 0x58000 8192
+_extern buf62
+_reserved DMb 0x58000 8192
+
+_symbol buf61 0x5C000 8192
+_extern buf61
+_reserved DMb 0x5C000 8192
+
+_symbol buf60 0x56000 8192
+_extern buf60
+_reserved DMb 0x56000 8192
+
+_reserved DMb 0x60000 0x10000  // No tile with memory exists to the north.
+// east -------------------------------------------------
+_symbol buf69 0x70400 8192
+_extern buf69
+_reserved DMb 0x70400 8192
+
+_symbol buf68 0x74000 8192
+_extern buf68
+_reserved DMb 0x74000 8192
+
+_symbol buf67 0x78000 8192
+_extern buf67
+_reserved DMb 0x78000 8192
+
+_symbol buf66 0x7C000 8192
+_extern buf66
+_reserved DMb 0x7C000 8192
+
+_symbol buf65 0x76000 8192
+_extern buf65
+_reserved DMb 0x76000 8192
+
+// end mapping neighbors tile memory
+
+_reserved DMb 0x80000 0x80000 // And everything else the core can't see
+_include _file mm.o
+_resolve _main core_1_5

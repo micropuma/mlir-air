@@ -1,0 +1,1 @@
+g++-13 %S/test.cpp -o test.exe -std=c++23 -Wall %xrt_flags -lrt -lstdc++ -lboost_program_options -lboost_filesystem

@@ -39,3 +39,7 @@ libadf.a
 
 install-pcie/
 build-pcie/
+
+*.o.*
+*.o
+*.log

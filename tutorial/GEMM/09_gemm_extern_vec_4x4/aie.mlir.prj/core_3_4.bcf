@@ -1,0 +1,102 @@
+_entry_point _main_init
+_symbol core_3_4 _after _main_init
+_symbol _main_init 0
+_reserved DMb 0x00000 0x40000 // Don't put data in code memory
+_stack DM_stack 0x70000 0x400 // stack for core
+
+// mapping neighbors tile memory
+// south -------------------------------------------------
+_reserved DMb 0x40000 0x10000  // Don't allocate variables in south neighbor
+
+_symbol buf39 0x40400 8192
+_extern buf39
+_reserved DMb 0x40400 8192
+
+_symbol buf38 0x44000 8192
+_extern buf38
+_reserved DMb 0x44000 8192
+
+_symbol buf37 0x48000 8192
+_extern buf37
+_reserved DMb 0x48000 8192
+
+_symbol buf36 0x4C000 8192
+_extern buf36
+_reserved DMb 0x4C000 8192
+
+_symbol buf35 0x46000 8192
+_extern buf35
+_reserved DMb 0x46000 8192
+
+// west -------------------------------------------------
+_reserved DMb 0x50000 0x10000  // Don't allocate variables in west neighbor
+
+_symbol buf54 0x50400 8192
+_extern buf54
+_reserved DMb 0x50400 8192
+
+_symbol buf53 0x54000 8192
+_extern buf53
+_reserved DMb 0x54000 8192
+
+_symbol buf52 0x58000 8192
+_extern buf52
+_reserved DMb 0x58000 8192
+
+_symbol buf51 0x5C000 8192
+_extern buf51
+_reserved DMb 0x5C000 8192
+
+_symbol buf50 0x56000 8192
+_extern buf50
+_reserved DMb 0x56000 8192
+
+// north -------------------------------------------------
+_reserved DMb 0x60000 0x10000  // Don't allocate variables in north neighbor
+
+_symbol buf79 0x60400 8192
+_extern buf79
+_reserved DMb 0x60400 8192
+
+_symbol buf78 0x64000 8192
+_extern buf78
+_reserved DMb 0x64000 8192
+
+_symbol buf77 0x68000 8192
+_extern buf77
+_reserved DMb 0x68000 8192
+
+_symbol buf76 0x6C000 8192
+_extern buf76
+_reserved DMb 0x6C000 8192
+
+_symbol buf75 0x66000 8192
+_extern buf75
+_reserved DMb 0x66000 8192
+
+// east -------------------------------------------------
+_symbol buf59 0x70400 8192
+_extern buf59
+_reserved DMb 0x70400 8192
+
+_symbol buf58 0x74000 8192
+_extern buf58
+_reserved DMb 0x74000 8192
+
+_symbol buf57 0x78000 8192
+_extern buf57
+_reserved DMb 0x78000 8192
+
+_symbol buf56 0x7C000 8192
+_extern buf56
+_reserved DMb 0x7C000 8192
+
+_symbol buf55 0x76000 8192
+_extern buf55
+_reserved DMb 0x76000 8192
+
+// end mapping neighbors tile memory
+
+_reserved DMb 0x80000 0x80000 // And everything else the core can't see
+_include _file mm.o
+_resolve _main core_3_4
