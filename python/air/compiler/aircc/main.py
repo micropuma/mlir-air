@@ -292,7 +292,7 @@ def lower_airrt_to_airhost(air_to_aie_module, air_placed_module, air_mlir_filena
 
         # air runtime include path
         thispath = os.path.dirname(os.path.realpath(__file__))
-        cmd += [f"-I{thispath}/../../../../runtime_lib/airhost/include"]
+        cmd += [f"-I{thispath}/../../../../runtime_lib/x86_64/airhost/include"]
 
         # aie runtime include path
         if "x86_64" in aiecc_target:

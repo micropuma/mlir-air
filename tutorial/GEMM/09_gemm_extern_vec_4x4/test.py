@@ -215,7 +215,7 @@ with air.ir.Context() as ctx, Location.unknown():
             [
                 "canonicalize",
                 "cse",
-                "air-to-aie{row-offset=2 col-offset=0 device=npu1_4col emit-while-loop=true}",
+                "air-to-aie{row-offset=2 col-offset=0 device=xcvc1902 emit-while-loop=true}",
                 "canonicalize",
             ]
         )
@@ -230,23 +230,23 @@ with air.ir.Context() as ctx, Location.unknown():
     ## MLIR-AIR runtime lowering
     ################################################
 
-    pipeline = (
-        "builtin.module("
-        + ",".join(
-            [
-                "air-to-std",
-                "canonicalize",
-                "symbol-dce",
-                "func.func(affine-loop-opt{affine-opt-tile-sizes=4,4})",
-                "func.func(air-unroll-outer-affine-loops{depth=2})",
-                "affine-expand-index-ops",
-                "airrt-to-npu",
-                "canonicalize",
-            ]
-        )
-        + ")"
-    )
-    pm = air.passmanager.PassManager.parse(pipeline)
-    pm.run(air_module.operation)
-    with open("aie.mlir", "w") as f:
-        f.write(str(air_module))
+    # pipeline = (
+    #     "builtin.module("
+    #     + ",".join(
+    #         [
+    #             "air-to-std",
+    #             "canonicalize",
+    #             "symbol-dce",
+    #             "func.func(affine-loop-opt{affine-opt-tile-sizes=4,4})",
+    #             "func.func(air-unroll-outer-affine-loops{depth=2})",
+    #             "affine-expand-index-ops",
+    #             "airrt-to-llvm",
+    #             "canonicalize",
+    #         ]
+    #     )
+    #     + ")"
+    # )
+    # pm = air.passmanager.PassManager.parse(pipeline)
+    # pm.run(air_module.operation)
+    # with open("aie.mlir", "w") as f:
+    #     f.write(str(air_module))
