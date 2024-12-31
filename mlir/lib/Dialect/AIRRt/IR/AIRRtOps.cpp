@@ -24,6 +24,7 @@ namespace airrt {
 // ModuleMetadataOp
 //===----------------------------------------------------------------------===//
 
+// 在.td中定义hasCustomParsing()为true，表示自定义解析
 void ModuleMetadataOp::print(OpAsmPrinter &p) {
   p.printOptionalAttrDictWithKeyword((*this)->getAttrs());
   p.printRegion(getSegments(), /*printEntryBlockArgs=*/false,
