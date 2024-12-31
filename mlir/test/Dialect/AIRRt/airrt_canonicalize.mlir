@@ -10,8 +10,12 @@
 // CHECK-LABEL: wait_all_0
 // CHECK-NEXT: return
 func.func @wait_all_0() -> () {
+  // 生成一个事件对象
   %0 = airrt.wait_all : !airrt.event
+  // 显示异步等待这个对象
   airrt.wait_all %0
+
+  // 这个pass期待的是经过canonicalize之后，这个wait_all会被删除
   return
 }
 

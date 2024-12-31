@@ -6,9 +6,13 @@
 //
 //===----------------------------------------------------------------------===//
 
+// 关于代码中所用到的所有traits信息，参考：
+// https://mlir.llvm.org/docs/Traits/#terminator
+
 #ifndef AIRRT_OPS
 #define AIRRT_OPS
 
+// 在cmake中，这个.td提供生成airrt cpp的所有代码
 include "air/Dialect/AIRRt/AIRRtBase.td"
 include "mlir/IR/SymbolInterfaces.td"
 
@@ -16,6 +20,10 @@ class AIRRt_Op<string mnemonic, list<Trait> traits = []>
     : Op<AIRRt_Dialect, mnemonic, traits> {
 }
 
+/// ==================================== Module, Segment, Herd Metadata ====================================
+// 参考https://mlir.llvm.org/doxygen/OpDefinition_8h_source.html
+// SingleBlockImplicitTerminator: 
+// This class provides APIs and verifiers for ops with regions having a single block that must terminate with TerminatorOpType.
 def AIRRt_ModuleMetadataOp : AIRRt_Op<"module_metadata", [
   SingleBlockImplicitTerminator<"ModuleMetadataTerminatorOp">
 ]> {
@@ -32,6 +40,8 @@ def AIRRt_ModuleMetadataOp : AIRRt_Op<"module_metadata", [
   let hasCustomAssemblyFormat = 1;
 }
 
+// 这个op是一个terminator，用于结束ModuleMetadataOp的region
+// 因此需要实现判断其parent是否为ModuleMetadataOp的trait
 def AIRRt_ModuleMetadataTerminatorOp
     : AIRRt_Op<"module_metadata_terminator",
                [Terminator, HasParent<"ModuleMetadataOp">]> {
@@ -41,6 +51,8 @@ def AIRRt_ModuleMetadataTerminatorOp
   let assemblyFormat = "attr-dict";
 }
 
+// 同样的MetadataOp，先前的是module层级，里面存放segment的metadata
+// 这个是segment层级，里面存放herd的metadata
 def AIRRt_SegmentMetadataOp : AIRRt_Op<"segment_metadata", [
   HasParent<"ModuleMetadataOp">,
   SingleBlockImplicitTerminator<"SegmentMetadataTerminatorOp">
@@ -54,6 +66,9 @@ def AIRRt_SegmentMetadataOp : AIRRt_Op<"segment_metadata", [
     StrAttr:$sym_name
   );
   let results = (outs);
+
+  // segement的region中包含herd的metadata
+  // 1表示只有一个子操作，并不等于1表示只有一个herd
   let regions = (region SizedRegion<1>:$herds);
   let hasCustomAssemblyFormat = 1;
 }
@@ -93,9 +108,12 @@ def AIRRt_HerdMetadataTerminatorOp
   let assemblyFormat = "attr-dict";
 }
 
+/// ==================================== Load Operation in different hierarchy ====================================
 def AIRRt_HerdLoadOp : AIRRt_Op<"herd_load", []> {
     let summary = "load a herd";
     let arguments = (ins StrAttr:$sym_name, Variadic<AnyType>:$rtp);
+
+    // results中一个是herd的handle，一个是event
     let results = (outs I64:$h, Optional<AIRRt_Event>:$event);
     let assemblyFormat = [{
       $sym_name ` ``(` $rtp `)` attr-dict `:` functional-type($rtp, results)
@@ -111,6 +129,9 @@ def AIRRt_SegmentLoadOp : AIRRt_Op<"segment_load", []> {
     }];
 }
 
+/// ==================================== dma copy op ====================================
+// DmaMemcpyNdOp是一个dma操作，用于将数据从一个内存区域复制到另一个内存区域
+// 无关乎是Segment还是herd
 def AIRRt_DmaMemcpyNdOp: AIRRt_Op<"dma_memcpy_nd", []> {
   let summary = "dma operator";
   let arguments = (
@@ -130,6 +151,8 @@ def AIRRt_DmaMemcpyNdOp: AIRRt_Op<"dma_memcpy_nd", []> {
         I64:$stride2,
         I64:$stride1
   );
+
+  // result返回的都是以event的方式返回的
   let results = (outs Optional<AIRRt_Event>:$event);
   let assemblyFormat = [{
     `(` $id `,`$x `,`$y `,`$memref
@@ -179,6 +202,7 @@ def AIRRt_MemcpyNdOp: AIRRt_Op<"memcpy_nd", []> {
   }];
 }
 
+/// ==================================== alloc op ====================================
 def AIRRt_AllocOp: AIRRt_Op<"alloc", []> {
   let summary = "AIRRt Allocation Op";
   let arguments = (ins);
@@ -205,6 +229,7 @@ def AIRRt_DeallocOp: AIRRt_Op<"dealloc", []> {
   let hasCanonicalizer  = 1;
 }
 
+/// ==================================== wait op ====================================
 def AIRRt_WaitAllOp : AIRRt_Op<"wait_all", []> {
   let arguments = (ins Variadic<AIRRt_Event>:$events);
   let results = (outs Optional<AIRRt_Event>:$event);

@@ -16,6 +16,7 @@ using namespace mlir;
 
 namespace xilinx {
 namespace airrt {
+// 利用mlir的type system定义TensorType
 class TensorType : public Type::TypeBase<TensorType, Type, TypeStorage> {
 public:
   using Base::Base;
@@ -23,6 +24,10 @@ public:
   static constexpr StringLiteral name = "xilinx.airrt.tensor";
 };
 
+/* def AIRRt_Event : DialectType<
+      AIRRt_Dialect, CPred<"llvm::isa<xilinx::airrt::EventType>($_self)">, "event type">,
+      BuildableType<"xilinx::airrt::EventType::get($_builder.getContext())">;
+*/
 class EventType : public Type::TypeBase<EventType, Type, TypeStorage> {
 public:
   using Base::Base;

@@ -22,6 +22,7 @@ can be lowered to a combination of standard and LLVM dialects.
   let useDefaultTypePrinterParser = 1;
 }
 
+// 定义event类型
 def AIRRt_Event : DialectType<
   AIRRt_Dialect, CPred<"llvm::isa<xilinx::airrt::EventType>($_self)">, "event type">,
              BuildableType<"xilinx::airrt::EventType::get($_builder.getContext())">;
