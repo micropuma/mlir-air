@@ -1,0 +1,1 @@
+clang++ test.cpp -v -I$AIR_HOST_LIB/include -I$HSA_DIR/include -L$HSA_DIR/lib -lhsa-runtime64 -I$LIBXAIE_DIR/include -L$LIBXAIE_DIR/lib -lxaiengine -I$AIE_RUNTIME_DIR/test_lib/include -L$AIE_RUNTIME_DIR/test_lib/lib -ltest_lib $AIR_HOST_LIB/libairhost_shared.so -Wl,--whole-archive test.a -Wl,--no-whole-archive -rdynamic -o test.elf
