@@ -1,0 +1,1 @@
+aircc.py -v  input.mlir -o test.a

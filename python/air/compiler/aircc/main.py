@@ -123,14 +123,20 @@ def run_passes(pass_pipeline, mlir_module, opts, outputfile=None):
         with open(outputfile, "w") as g:
             g.write(str(mlir_module))
 
-
+# 针对非npu平台的airrt，使用lower_airrt_to_airhost函数
 def lower_airrt_to_airhost(air_to_aie_module, air_placed_module, air_mlir_filename):
+    # Split the input into one output per aie.device op 
     pass_pipeline = "air-split-devices{"
     pass_pipeline = pass_pipeline + f"output-prefix={opts.tmpdir}/" + "}"
     run_passes("builtin.module(" + pass_pipeline + ")", air_to_aie_module, opts)
 
     # lower the airrt control program to llvm dialect
 
+    # core pass is air-to-std
+    # This pass converts AIR dialect herd launch operations into loop nests 
+    # representing the host-side control program for the herd. 
+    # It also converts AIR dialect memcpy operations into AIRRt memcpy operations.
+    # This pass actually find host code from mlir and convert to airrt for further lowering.
     airrt_module = Module.parse(str(air_to_aie_module))
     aie_ctrl_airrt = opts.tmpdir + "/airrt." + air_mlir_filename
     pass_pipeline = ",".join(
@@ -145,14 +151,29 @@ def lower_airrt_to_airhost(air_to_aie_module, air_placed_module, air_mlir_filena
             "cse",
         ]
     )
+    # write into aie_ctrl_airrt file.
     run_passes(
         "builtin.module(" + pass_pipeline + ")", airrt_module, opts, aie_ctrl_airrt
     )
 
+    # lower the airrt control program to llvm dialect
+    # ==================================== airrt-to-llvm ====================================
+    # This pass lowers AIRRt dialect to function calls and data structures matching those found in air_host.h.
+    # AIRRt static metadata is transformed to LLVM dialect data structures. 
+    # The data is generated as a number of globals with external linkage. 
+    # The data layout is closely tied the AIR runtime and the definitions in air_host.h. 
+    # Any changes to this pass must be reflected there. 
+
+    # ==================================== one-shot-bufferize ====================================
+    # refer to https://mlir.llvm.org/docs/Bufferization/
+    # This pass performs bufferization in a single shot.
     aie_ctrl = opts.tmpdir + "/aie_ctrl." + air_mlir_filename
     pass_pipeline = ",".join(["airrt-to-llvm", "one-shot-bufferize"])
+
+    # convert airrt.test.mlir to aie_ctrl.test.mlir
     run_passes("builtin.module(" + pass_pipeline + ")", airrt_module, opts, aie_ctrl)
 
+    # I guess this is to do rt in one pass
     aie_ctrl_refback = opts.tmpdir + "/refback." + air_mlir_filename
     pass_pipeline = ",".join(
         [
@@ -176,6 +197,7 @@ def lower_airrt_to_airhost(air_to_aie_module, air_placed_module, air_mlir_filena
         aie_ctrl_refback,
     )
 
+    # lower previous llvm dialect to llvm code
     aie_ctrl_llvm = opts.tmpdir + "/llvm." + air_mlir_filename
     pass_pipeline = ",".join(
         [
@@ -194,18 +216,22 @@ def lower_airrt_to_airhost(air_to_aie_module, air_placed_module, air_mlir_filena
     )
 
     # compile the llvm dialect into a .o object file
+    # now the kernel code is aie dialect, and the host code is all llvm code
 
     aie_ctrl_llvm_ir = opts.tmpdir + "/" + air_mlir_filename + ".ll"
     do_call(
         ["aie-translate", "--mlir-to-llvmir", aie_ctrl_llvm, "-o", aie_ctrl_llvm_ir]
     )
 
+    # use llvm-opt to optimize the llvm code
     aie_ctrl_llvm_opt_bc = opts.tmpdir + "/" + air_mlir_filename + ".opt.bc"
     do_call(["opt", "-O3", aie_ctrl_llvm_ir, "-o", aie_ctrl_llvm_opt_bc])
 
     aie_ctrl_llvm_opt_ir = opts.tmpdir + "/" + air_mlir_filename + ".opt.ll"
     do_call(["llvm-dis", aie_ctrl_llvm_opt_bc, "-o", aie_ctrl_llvm_opt_ir])
 
+    # compile the llvm dialect into a .o object file
+    # with O3 optimization and pic relocation model
     aie_ctrl_obj = opts.tmpdir + "/" + air_mlir_filename + ".o"
     llc_target = None
     if "x86_64" in opts.host_target:
@@ -258,6 +284,8 @@ def lower_airrt_to_airhost(air_to_aie_module, air_placed_module, air_mlir_filena
         aiecc_target = opts.host_target if opts.host_target else aiecc_target
 
         # run aiecc to make the elf and configuration files
+        # compiling air_project/aiecc.graph_0.mlir
+        # created temporary directory /media/4T/home/douliyang/mlir-workspace/mlir-air/tutorial/vck5000-test/19_air_nd_memcpy_to_tile_dma/air_project/graph_0
         sysroot = opts.sysroot if opts.sysroot else "/"
         do_call(
             ["aiecc.py"]
@@ -311,7 +339,7 @@ def lower_airrt_to_airhost(air_to_aie_module, air_placed_module, air_mlir_filena
         obj_files.append(obj_file)
 
     # combine the host side .o files generated above into a single library
-
+    # generate .a or .so file
     lib_file = air_mlir_filename + (".so" if opts.shared else ".a")
     lib_file = opts.tmpdir + "/" + lib_file
     if opts.shared:
@@ -326,7 +354,7 @@ def lower_airrt_to_airhost(air_to_aie_module, air_placed_module, air_mlir_filena
     if opts.output_file:
         do_call(["cp", lib_file, opts.output_file])
 
-
+# aircc.py 在解析命令行参数后以及readin mlir文件后，调用run函数
 def run(mlir_module, args=None):
     global opts
     global aiecc_path
@@ -342,6 +370,7 @@ def run(mlir_module, args=None):
         if opts.verbose:
             print("created temporary directory", tmpdirname)
 
+    # 设定默认值
     if not opts.num_cols:
         opts.num_cols = 4 if "npu" in opts.device else 10
 
@@ -354,9 +383,11 @@ def run(mlir_module, args=None):
     if not opts.row_offset:
         opts.row_offset = 2
 
+    # verbose模式，打印编译信息
     if opts.verbose:
         print("compiling %s for %s\n" % (opts.air_mlir_file, opts.device))
 
+    # 查找aiecc.py的可执行路径
     aiecc_path = shutil.which("aiecc.py")
     if aiecc_path == None:
         print("Error: could not find aiecc.py")
@@ -367,6 +398,7 @@ def run(mlir_module, args=None):
         print("Using aiecc.py from: ", aiecc_path)
 
     with mlir_module.context as ctx:
+        # 第一个pass pipeline：air-place-herds
         _, air_mlir_filename = os.path.split(opts.air_mlir_file)
         air_place_pass = (
             "air-place-herds{"
@@ -378,6 +410,11 @@ def run(mlir_module, args=None):
         )
 
         air_placed = opts.tmpdir + "/placed." + air_mlir_filename
+
+        # 生辰第一个pass pipeline
+        # pass pipeline：air-insert-launch-and-segment-around-herd, air-lower-herd-parallel
+        # air-dma-to-channel, canonicalize, cse, air-specialize-channel-wrap-and-stride
+        # func.func(air-renumber-dma), func.func(convert-linalg-to-loops), air-place-pass
         pass_pipeline = ",".join(
             [
                 "air-insert-launch-and-segment-around-herd",
@@ -398,11 +435,17 @@ def run(mlir_module, args=None):
                 air_place_pass,
             ]
         )
+
+        # 使用pass pipeline对mlir_module进行处理
+        # 输入是mlir_module，输出是air_placed
         air_placed_module = Module.parse(str(mlir_module))
         run_passes(
             "builtin.module(" + pass_pipeline + ")", air_placed_module, opts, air_placed
         )
 
+        # 第二个pass pipeline：air-to-aie
+        # builtin.module(air-to-aie{emit-while-loop=true row-offset=4 col-offset=5 device=xcvc1902}) 
+        # This pass converts AIR dialect herd and segment operations into AIE dialect modules and AIRRt dialect metadata.
         air_to_aie_pass = "air-to-aie{"
         air_to_aie_pass = (
             air_to_aie_pass
@@ -411,6 +454,8 @@ def run(mlir_module, args=None):
         air_to_aie_pass = air_to_aie_pass + f" row-offset={opts.row_offset}"
         air_to_aie_pass = air_to_aie_pass + f" col-offset={opts.col_offset}"
         air_to_aie_pass = air_to_aie_pass + f" device={opts.device}"
+
+        # 判断是否print packet的trace 路线
         if opts.trace_size > 0:
             air_to_aie_pass = air_to_aie_pass + " insert-trace-packet-flow=true"
         air_to_aie_pass = air_to_aie_pass + "}"
@@ -418,6 +463,8 @@ def run(mlir_module, args=None):
 
         air_to_aie_file = opts.tmpdir + "/aie." + air_mlir_filename
         air_to_aie_module = Module.parse(str(air_placed_module))
+
+        # 运行pass，输入是air_placed_module，输出是air_to_aie_file
         run_passes(
             "builtin.module(" + pass_pipeline + ")",
             air_to_aie_module,
@@ -425,6 +472,7 @@ def run(mlir_module, args=None):
             air_to_aie_file,
         )
 
+        # npu对于airrt有专属的pass
         if "npu" in opts.device:
             airrt_to_npu_pass = "airrt-to-npu{"
             airrt_to_npu_pass = airrt_to_npu_pass + f" trace-size={opts.trace_size}"
@@ -474,6 +522,7 @@ def run(mlir_module, args=None):
             ]
             aiecc.run(air_to_npu_module, aiecc_options)
         else:
+            # 对于VCK5000平台，使用lower_airrt_to_airhost函数
             lower_airrt_to_airhost(
                 air_to_aie_module, air_placed_module, air_mlir_filename
             )
