@@ -1,1 +1,1 @@
-aircc.py -v  input.mlir -o test.a
+aircc.py -v  input2.mlir -o test.a
