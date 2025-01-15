@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug air-opt",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/home/douliyang/large/mlir-workspace/mlir-air/install-pcie/bin/air-opt", // 替换为你的可执行文件路径
+            "args": [
+                "/home/douliyang/large/mlir-workspace/mlir-air/tutorial/E2E/matmul/one_dim/input.mlir",
+                "--air-copy-to-dma",
+                "-debug", // 添加 -debug 参数
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+        }
+    ]
+}
