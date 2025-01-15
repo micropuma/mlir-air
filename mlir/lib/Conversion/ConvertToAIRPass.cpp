@@ -44,6 +44,7 @@ using namespace xilinx;
 
 static std::atomic<uint64_t> DmaMemcpyOpID;
 
+// 这个辅助函数负责将memref::CopyOp转换为air::DmaMemcpyNdOp
 static FailureOr<air::DmaMemcpyNdOp>
 matchAndRewriteCopyOp(memref::CopyOp op, RewriterBase &rewriter) {
   auto loc = op.getLoc();
@@ -62,12 +63,17 @@ matchAndRewriteCopyOp(memref::CopyOp op, RewriterBase &rewriter) {
       (dst_type.getMemorySpaceAsInt() == (int)air::MemorySpace::L3))
     return failure();
 
+  // air的dma copy不支持动态shape
   if (!(src_type.hasStaticShape() || dst_type.hasStaticShape()))
     return failure();
 
   SmallVector<Value, 4> src_offsets, dst_offsets;
   SmallVector<Value, 4> src_strides, dst_strides;
   SmallVector<Value, 4> src_sizes, dst_sizes;
+
+  // ========================================================================= //
+  // 辅助函数，用于从memref::SubViewOp中提取操作数
+  // 并将维度等信息存储在offsets，sizes，strides中
   auto extractOperandsFromSubview = [&](memref::SubViewOp subview,
                                         auto &offsets, auto &sizes,
                                         auto &strides) {
@@ -78,6 +84,7 @@ matchAndRewriteCopyOp(memref::CopyOp op, RewriterBase &rewriter) {
     auto loc = subview.getLoc();
 
     // get the strides and offsets from the memref type
+    // 通过type，起始offset，size，stride来推断出subview的类型
     auto inferredType =
         llvm::cast<MemRefType>(memref::SubViewOp::inferResultType(
             subview.getSourceType(), static_offsets, static_sizes,
@@ -91,6 +98,8 @@ matchAndRewriteCopyOp(memref::CopyOp op, RewriterBase &rewriter) {
       return; // failure();
     }
 
+    // 将static_offsets，static_sizes，static_strides转换为Value
+    // 并存储在一个smallvector中 
     for (auto o : static_offsets) {
       if (o >= 0)
         offsets.push_back(rewriter.create<arith::ConstantIndexOp>(loc, o));
@@ -103,6 +112,8 @@ matchAndRewriteCopyOp(memref::CopyOp op, RewriterBase &rewriter) {
       strides.push_back(rewriter.create<arith::ConstantIndexOp>(loc, s));
   };
 
+  // ========================================================================= //
+  // 利用先前定义好的辅助函数，处理memref::CopyOp的src和dst
   if (auto subview = src.getDefiningOp<memref::SubViewOp>()) {
     extractOperandsFromSubview(subview, src_offsets, src_sizes, src_strides);
     src = subview.getSource();
@@ -113,11 +124,15 @@ matchAndRewriteCopyOp(memref::CopyOp op, RewriterBase &rewriter) {
     dst = subview.getSource();
   }
 
+  // ========================================================================= //
+  // 利用处理好的src和dst，创建air::DmaMemcpyNdOp
   SmallVector<Value, 4> deps;
   SmallVector<Type, 4> tys;
   auto dma = rewriter.create<air::DmaMemcpyNdOp>(
       loc, tys, deps, dst, dst_offsets, dst_sizes, dst_strides, src,
       src_offsets, src_sizes, src_strides);
+  // 设定dma的属性
+  // 可以看到，这里的id是一个全局变量，每次创建一个新的DmaMemcpyNdOp，id都会自增
   dma->setAttr(
       "id", mlir::IntegerAttr::get(mlir::IntegerType::get(op->getContext(), 32),
                                    ++DmaMemcpyOpID));
@@ -126,6 +141,9 @@ matchAndRewriteCopyOp(memref::CopyOp op, RewriterBase &rewriter) {
   return dma;
 }
 
+// ========================================================================= //
+// 在matchAndRewriteCopyOp 中定义了一个辅助函数extractOperandsFromSubview
+// 是lambda函数，这里将其提取出来
 static void extractOperandsFromSubview(memref::SubViewOp subview,
                                        OpBuilder &builder,
                                        SmallVector<Value, 4> &offsets,
@@ -496,6 +514,7 @@ static void propagateLinkWith(Operation *op, air::HerdOp herdOp) {
   });
 }
 
+// 将scf::ParallelOp转换为air::HerdOp
 class ScfParToHerdConversion : public OpRewritePattern<scf::ParallelOp> {
 public:
   using OpRewritePattern<scf::ParallelOp>::OpRewritePattern;
@@ -1123,10 +1142,11 @@ struct CopyToDmaPass : public air::impl::CopyToDmaBase<CopyToDmaPass> {
                            scf::SCFDialect, air::airDialect,
                            arith::ArithDialect, memref::MemRefDialect>();
 
+    // Affine dialect 在目前是合法dialect
     target.addLegalOp<affine::AffineApplyOp, affine::AffineForOp,
                       affine::AffineLoadOp, affine::AffineStoreOp,
                       affine::AffineYieldOp>();
-
+    // 只有memref::CopyOp的源和目的的内存空间相同才是合法的
     target.addDynamicallyLegalOp<memref::CopyOp>([](memref::CopyOp co) {
       auto src_type = llvm::dyn_cast<MemRefType>(co.getSource().getType());
       auto dst_type = llvm::dyn_cast<MemRefType>(co.getTarget().getType());
@@ -1155,6 +1175,12 @@ struct CopyToDmaPass : public air::impl::CopyToDmaBase<CopyToDmaPass> {
       assert(0);
     }
 
+    // 处理affine的 DmaWait op
+    // affine.dma_start %src[%i, %j], %dst[%k, %l], %tag[%index], %num_elements :
+    //   memref<2048xf32, 0>, memref<256xf32, 1>, memref<1xi32, 2>
+    // ...
+    // ...
+    // affine.dma_wait %tag[%index], %num_elements : memref<1xi32, 2>
     std::vector<Operation *> waits;
     for (auto f : module.getOps<func::FuncOp>()) {
       f.walk([&](Operation *op) {
@@ -1299,6 +1325,7 @@ static void getSegmentNames(ModuleOp module) {
   }
 }
 
+// 重点关注的pass，将scf.parallel转换为air.herd
 struct ParallelToHerdPass
     : public air::impl::ParallelToHerdBase<ParallelToHerdPass> {
 
