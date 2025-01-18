@@ -28,7 +28,7 @@ def read_mlir_file(file_path):
 
 with air.ir.Context() as ctx, Location.unknown():
     # Read the MLIR file
-    air_source_code = read_mlir_file("input.mlir")
+    air_source_code = read_mlir_file("input1.mlir")
     air_module = Module.parse(air_source_code)
 
     with open("input-check.mlir", "w") as f:
@@ -44,12 +44,11 @@ with air.ir.Context() as ctx, Location.unknown():
         "builtin.module("
         + ",".join(
             [
-                # air-copy-to-dma 触发了scf.parallel的merge nest pass
-                "air-copy-to-dma",
                 "buffer-results-to-out-params",
                 "air-linalg-to-func{link-with=mm.o}",
                 "air-par-to-herd{depth=0}",
-                # "air-par-to-launch{has-air-segment=true}",
+                "air-par-to-launch{has-air-segment=true}",
+                "air-copy-to-dma",
                 "canonicalize",
                 "cse",
             ]

@@ -799,6 +799,7 @@ private:
 // Temporary custom LinalgOp promotion pattern,
 // copied from mlir before 5a001136
 //
+// 通过子视图的提升来优化Linalg操作。提升是指将子视图的内存空间提升到更高的内存层次。
 struct PromoteLinalgOpPattern : public RewritePattern {
   PromoteLinalgOpPattern(
       MLIRContext *context, linalg::LinalgPromotionOptions options,
@@ -810,8 +811,10 @@ struct PromoteLinalgOpPattern : public RewritePattern {
   LogicalResult matchAndRewrite(Operation *op,
                                 PatternRewriter &rewriter) const override {
 
+    // Check if is not filterd
     if (failed(filter.checkAndNotify(rewriter, op)))
       return failure();
+    // check if can be promoted
     if (failed(promoteSubviewsPrecondition(op, options)))
       return failure();
 
@@ -1470,6 +1473,8 @@ public:
     }
   }
 
+  // ============================ Pass1 ============================
+  // 专门针对matmul的一个pass
   void runMatmulPatterns(func::FuncOp funcOp) {
     MLIRContext *ctx = funcOp.getContext();
 
@@ -1508,6 +1513,7 @@ public:
       SmallVector<unsigned, 3> l2_tile_interchange{0, 1, 2};
       SmallVector<int64_t, 3> l2_promote_operands;
 
+      // 从命令行中获取tile，interchange等linalg变换信息
       for (int i = 0, e = clL1TileSize.size(); i < e; i++)
         l1_tile_size[i] = clL1TileSize[i];
 
@@ -2001,6 +2007,7 @@ void transform::LinalgTileOp::getEffects(
 //===----------------------------------------------------------------------===//
 // LinalgPromoteOp
 //===----------------------------------------------------------------------===//
+// 使用transfrom dialect来完成linalg的promote操作
 
 DiagnosedSilenceableFailure
 transform::LinalgPromoteOp::apply(transform::TransformRewriter &rewriter,

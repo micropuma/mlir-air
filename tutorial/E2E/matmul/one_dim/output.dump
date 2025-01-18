@@ -1,19 +1,18 @@
 // -----// IR Dump After InsertEmptyLaunchOverHerd (air-insert-launch-and-segment-around-herd) //----- //
 module {
-  func.func @matadd(%arg0: memref<20xf32>, %arg1: memref<20xf32>, %arg2: memref<20xf32>) {
-    %c20 = arith.constant 20 : index
+  func.func @matadd(%arg0: memref<2x2xf32>, %arg1: memref<2x2xf32>, %arg2: memref<2x2xf32>) {
+    %c2 = arith.constant 2 : index
     %c1 = arith.constant 1 : index
     %c1_0 = arith.constant 1 : index
-    %c1_1 = arith.constant 1 : index
-    air.launch (%arg3, %arg4) in (%arg5=%c1_0, %arg6=%c1_1) args(%arg7=%arg0, %arg8=%arg1, %arg9=%arg2) : memref<20xf32>, memref<20xf32>, memref<20xf32> {
-      air.segment @matadd_0  args(%arg10=%arg3, %arg11=%arg4, %arg12=%arg5, %arg13=%arg6, %arg14=%arg7, %arg15=%arg8, %arg16=%arg9) : index, index, index, index, memref<20xf32>, memref<20xf32>, memref<20xf32> {
-        %c20_2 = arith.constant 20 : index
-        %c1_3 = arith.constant 1 : index
-        air.herd @herd_0  tile (%arg17, %arg18) in (%arg19=%c20_2, %arg20=%c1_3) args(%arg21=%arg10, %arg22=%arg11, %arg23=%arg12, %arg24=%arg13, %arg25=%arg14, %arg26=%arg15, %arg27=%arg16) : index, index, index, index, memref<20xf32>, memref<20xf32>, memref<20xf32> {
-          %0 = memref.load %arg25[%arg17] : memref<20xf32>
-          %1 = memref.load %arg26[%arg17] : memref<20xf32>
+    air.launch (%arg3, %arg4) in (%arg5=%c1, %arg6=%c1_0) args(%arg7=%arg0, %arg8=%arg1, %arg9=%arg2) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
+      air.segment @matadd_0  args(%arg10=%arg3, %arg11=%arg4, %arg12=%arg5, %arg13=%arg6, %arg14=%arg7, %arg15=%arg8, %arg16=%arg9) : index, index, index, index, memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
+        %c2_1 = arith.constant 2 : index
+        %c2_2 = arith.constant 2 : index
+        air.herd @herd_0  tile (%arg17, %arg18) in (%arg19=%c2_1, %arg20=%c2_2) args(%arg21=%arg10, %arg22=%arg11, %arg23=%arg12, %arg24=%arg13, %arg25=%arg14, %arg26=%arg15, %arg27=%arg16) : index, index, index, index, memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
+          %0 = memref.load %arg25[%arg17, %arg18] : memref<2x2xf32>
+          %1 = memref.load %arg26[%arg17, %arg18] : memref<2x2xf32>
           %2 = arith.addf %0, %1 : f32
-          memref.store %2, %arg27[%arg17] : memref<20xf32>
+          memref.store %2, %arg27[%arg17, %arg18] : memref<2x2xf32>
         }
       }
     }
@@ -23,17 +22,16 @@ module {
 
 
 // -----// IR Dump After AIRLowerHerdParallelPass (air-lower-herd-parallel) //----- //
-func.func @matadd(%arg0: memref<20xf32>, %arg1: memref<20xf32>, %arg2: memref<20xf32>) {
+func.func @matadd(%arg0: memref<2x2xf32>, %arg1: memref<2x2xf32>, %arg2: memref<2x2xf32>) {
   %c1 = arith.constant 1 : index
-  air.launch (%arg3, %arg4) in (%arg5=%c1, %arg6=%c1) args(%arg7=%arg0, %arg8=%arg1, %arg9=%arg2) : memref<20xf32>, memref<20xf32>, memref<20xf32> {
-    air.segment @matadd_0  args(%arg10=%arg3, %arg11=%arg4, %arg12=%arg5, %arg13=%arg6, %arg14=%arg7, %arg15=%arg8, %arg16=%arg9) : index, index, index, index, memref<20xf32>, memref<20xf32>, memref<20xf32> {
-      %c20 = arith.constant 20 : index
-      %c1_0 = arith.constant 1 : index
-      air.herd @herd_0  tile (%arg17, %arg18) in (%arg19=%c20, %arg20=%c1_0) args(%arg21=%arg10, %arg22=%arg11, %arg23=%arg12, %arg24=%arg13, %arg25=%arg14, %arg26=%arg15, %arg27=%arg16) : index, index, index, index, memref<20xf32>, memref<20xf32>, memref<20xf32> {
-        %0 = memref.load %arg25[%arg17] : memref<20xf32>
-        %1 = memref.load %arg26[%arg17] : memref<20xf32>
+  air.launch (%arg3, %arg4) in (%arg5=%c1, %arg6=%c1) args(%arg7=%arg0, %arg8=%arg1, %arg9=%arg2) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
+    air.segment @matadd_0  args(%arg10=%arg3, %arg11=%arg4, %arg12=%arg5, %arg13=%arg6, %arg14=%arg7, %arg15=%arg8, %arg16=%arg9) : index, index, index, index, memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
+      %c2 = arith.constant 2 : index
+      air.herd @herd_0  tile (%arg17, %arg18) in (%arg19=%c2, %arg20=%c2) args(%arg21=%arg10, %arg22=%arg11, %arg23=%arg12, %arg24=%arg13, %arg25=%arg14, %arg26=%arg15, %arg27=%arg16) : index, index, index, index, memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
+        %0 = memref.load %arg25[%arg17, %arg18] : memref<2x2xf32>
+        %1 = memref.load %arg26[%arg17, %arg18] : memref<2x2xf32>
         %2 = arith.addf %0, %1 : f32
-        memref.store %2, %arg27[%arg17] : memref<20xf32>
+        memref.store %2, %arg27[%arg17, %arg18] : memref<2x2xf32>
       }
     }
   }
@@ -42,17 +40,16 @@ func.func @matadd(%arg0: memref<20xf32>, %arg1: memref<20xf32>, %arg2: memref<20
 
 // -----// IR Dump After Canonicalizer (canonicalize) //----- //
 module {
-  func.func @matadd(%arg0: memref<20xf32>, %arg1: memref<20xf32>, %arg2: memref<20xf32>) {
+  func.func @matadd(%arg0: memref<2x2xf32>, %arg1: memref<2x2xf32>, %arg2: memref<2x2xf32>) {
     %c1 = arith.constant 1 : index
-    air.launch (%arg3, %arg4) in (%arg5=%c1, %arg6=%c1) args(%arg7=%arg0, %arg8=%arg1, %arg9=%arg2) : memref<20xf32>, memref<20xf32>, memref<20xf32> {
-      air.segment @matadd_0  args(%arg10=%arg7, %arg11=%arg8, %arg12=%arg9) : memref<20xf32>, memref<20xf32>, memref<20xf32> {
-        %c20 = arith.constant 20 : index
-        %c1_0 = arith.constant 1 : index
-        air.herd @herd_0  tile (%arg13, %arg14) in (%arg15=%c20, %arg16=%c1_0) args(%arg17=%arg10, %arg18=%arg11, %arg19=%arg12) : memref<20xf32>, memref<20xf32>, memref<20xf32> {
-          %0 = memref.load %arg17[%arg13] : memref<20xf32>
-          %1 = memref.load %arg18[%arg13] : memref<20xf32>
+    air.launch (%arg3, %arg4) in (%arg5=%c1, %arg6=%c1) args(%arg7=%arg0, %arg8=%arg1, %arg9=%arg2) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
+      air.segment @matadd_0  args(%arg10=%arg7, %arg11=%arg8, %arg12=%arg9) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
+        %c2 = arith.constant 2 : index
+        air.herd @herd_0  tile (%arg13, %arg14) in (%arg15=%c2, %arg16=%c2) args(%arg17=%arg10, %arg18=%arg11, %arg19=%arg12) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
+          %0 = memref.load %arg17[%arg13, %arg14] : memref<2x2xf32>
+          %1 = memref.load %arg18[%arg13, %arg14] : memref<2x2xf32>
           %2 = arith.addf %0, %1 : f32
-          memref.store %2, %arg19[%arg13] : memref<20xf32>
+          memref.store %2, %arg19[%arg13, %arg14] : memref<2x2xf32>
         }
       }
     }
@@ -63,17 +60,16 @@ module {
 
 // -----// IR Dump After CSE (cse) //----- //
 module {
-  func.func @matadd(%arg0: memref<20xf32>, %arg1: memref<20xf32>, %arg2: memref<20xf32>) {
+  func.func @matadd(%arg0: memref<2x2xf32>, %arg1: memref<2x2xf32>, %arg2: memref<2x2xf32>) {
     %c1 = arith.constant 1 : index
-    air.launch (%arg3, %arg4) in (%arg5=%c1, %arg6=%c1) args(%arg7=%arg0, %arg8=%arg1, %arg9=%arg2) : memref<20xf32>, memref<20xf32>, memref<20xf32> {
-      air.segment @matadd_0  args(%arg10=%arg7, %arg11=%arg8, %arg12=%arg9) : memref<20xf32>, memref<20xf32>, memref<20xf32> {
-        %c20 = arith.constant 20 : index
-        %c1_0 = arith.constant 1 : index
-        air.herd @herd_0  tile (%arg13, %arg14) in (%arg15=%c20, %arg16=%c1_0) args(%arg17=%arg10, %arg18=%arg11, %arg19=%arg12) : memref<20xf32>, memref<20xf32>, memref<20xf32> {
-          %0 = memref.load %arg17[%arg13] : memref<20xf32>
-          %1 = memref.load %arg18[%arg13] : memref<20xf32>
+    air.launch (%arg3, %arg4) in (%arg5=%c1, %arg6=%c1) args(%arg7=%arg0, %arg8=%arg1, %arg9=%arg2) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
+      air.segment @matadd_0  args(%arg10=%arg7, %arg11=%arg8, %arg12=%arg9) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
+        %c2 = arith.constant 2 : index
+        air.herd @herd_0  tile (%arg13, %arg14) in (%arg15=%c2, %arg16=%c2) args(%arg17=%arg10, %arg18=%arg11, %arg19=%arg12) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
+          %0 = memref.load %arg17[%arg13, %arg14] : memref<2x2xf32>
+          %1 = memref.load %arg18[%arg13, %arg14] : memref<2x2xf32>
           %2 = arith.addf %0, %1 : f32
-          memref.store %2, %arg19[%arg13] : memref<20xf32>
+          memref.store %2, %arg19[%arg13, %arg14] : memref<2x2xf32>
         }
       }
     }
@@ -84,17 +80,16 @@ module {
 
 // -----// IR Dump After AIRSpecializeChannelWrapAndStridePattern (air-specialize-channel-wrap-and-stride) //----- //
 module {
-  func.func @matadd(%arg0: memref<20xf32>, %arg1: memref<20xf32>, %arg2: memref<20xf32>) {
+  func.func @matadd(%arg0: memref<2x2xf32>, %arg1: memref<2x2xf32>, %arg2: memref<2x2xf32>) {
     %c1 = arith.constant 1 : index
-    air.launch (%arg3, %arg4) in (%arg5=%c1, %arg6=%c1) args(%arg7=%arg0, %arg8=%arg1, %arg9=%arg2) : memref<20xf32>, memref<20xf32>, memref<20xf32> {
-      air.segment @matadd_0  args(%arg10=%arg7, %arg11=%arg8, %arg12=%arg9) : memref<20xf32>, memref<20xf32>, memref<20xf32> {
-        %c20 = arith.constant 20 : index
-        %c1_0 = arith.constant 1 : index
-        air.herd @herd_0  tile (%arg13, %arg14) in (%arg15=%c20, %arg16=%c1_0) args(%arg17=%arg10, %arg18=%arg11, %arg19=%arg12) : memref<20xf32>, memref<20xf32>, memref<20xf32> {
-          %0 = memref.load %arg17[%arg13] : memref<20xf32>
-          %1 = memref.load %arg18[%arg13] : memref<20xf32>
+    air.launch (%arg3, %arg4) in (%arg5=%c1, %arg6=%c1) args(%arg7=%arg0, %arg8=%arg1, %arg9=%arg2) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
+      air.segment @matadd_0  args(%arg10=%arg7, %arg11=%arg8, %arg12=%arg9) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
+        %c2 = arith.constant 2 : index
+        air.herd @herd_0  tile (%arg13, %arg14) in (%arg15=%c2, %arg16=%c2) args(%arg17=%arg10, %arg18=%arg11, %arg19=%arg12) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
+          %0 = memref.load %arg17[%arg13, %arg14] : memref<2x2xf32>
+          %1 = memref.load %arg18[%arg13, %arg14] : memref<2x2xf32>
           %2 = arith.addf %0, %1 : f32
-          memref.store %2, %arg19[%arg13] : memref<20xf32>
+          memref.store %2, %arg19[%arg13, %arg14] : memref<2x2xf32>
         }
       }
     }
@@ -104,17 +99,16 @@ module {
 
 
 // -----// IR Dump After AIRRenumberDmaIdPass (air-renumber-dma) //----- //
-func.func @matadd(%arg0: memref<20xf32>, %arg1: memref<20xf32>, %arg2: memref<20xf32>) {
+func.func @matadd(%arg0: memref<2x2xf32>, %arg1: memref<2x2xf32>, %arg2: memref<2x2xf32>) {
   %c1 = arith.constant 1 : index
-  air.launch (%arg3, %arg4) in (%arg5=%c1, %arg6=%c1) args(%arg7=%arg0, %arg8=%arg1, %arg9=%arg2) : memref<20xf32>, memref<20xf32>, memref<20xf32> {
-    air.segment @matadd_0  args(%arg10=%arg7, %arg11=%arg8, %arg12=%arg9) : memref<20xf32>, memref<20xf32>, memref<20xf32> {
-      %c20 = arith.constant 20 : index
-      %c1_0 = arith.constant 1 : index
-      air.herd @herd_0  tile (%arg13, %arg14) in (%arg15=%c20, %arg16=%c1_0) args(%arg17=%arg10, %arg18=%arg11, %arg19=%arg12) : memref<20xf32>, memref<20xf32>, memref<20xf32> {
-        %0 = memref.load %arg17[%arg13] : memref<20xf32>
-        %1 = memref.load %arg18[%arg13] : memref<20xf32>
+  air.launch (%arg3, %arg4) in (%arg5=%c1, %arg6=%c1) args(%arg7=%arg0, %arg8=%arg1, %arg9=%arg2) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
+    air.segment @matadd_0  args(%arg10=%arg7, %arg11=%arg8, %arg12=%arg9) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
+      %c2 = arith.constant 2 : index
+      air.herd @herd_0  tile (%arg13, %arg14) in (%arg15=%c2, %arg16=%c2) args(%arg17=%arg10, %arg18=%arg11, %arg19=%arg12) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
+        %0 = memref.load %arg17[%arg13, %arg14] : memref<2x2xf32>
+        %1 = memref.load %arg18[%arg13, %arg14] : memref<2x2xf32>
         %2 = arith.addf %0, %1 : f32
-        memref.store %2, %arg19[%arg13] : memref<20xf32>
+        memref.store %2, %arg19[%arg13, %arg14] : memref<2x2xf32>
       }
     }
   }
@@ -123,17 +117,16 @@ func.func @matadd(%arg0: memref<20xf32>, %arg1: memref<20xf32>, %arg2: memref<20
 
 // -----// IR Dump After ConvertLinalgToLoopsPass (convert-linalg-to-loops) //----- //
 module {
-  func.func @matadd(%arg0: memref<20xf32>, %arg1: memref<20xf32>, %arg2: memref<20xf32>) {
+  func.func @matadd(%arg0: memref<2x2xf32>, %arg1: memref<2x2xf32>, %arg2: memref<2x2xf32>) {
     %c1 = arith.constant 1 : index
-    air.launch (%arg3, %arg4) in (%arg5=%c1, %arg6=%c1) args(%arg7=%arg0, %arg8=%arg1, %arg9=%arg2) : memref<20xf32>, memref<20xf32>, memref<20xf32> {
-      air.segment @matadd_0  args(%arg10=%arg7, %arg11=%arg8, %arg12=%arg9) : memref<20xf32>, memref<20xf32>, memref<20xf32> {
-        %c20 = arith.constant 20 : index
-        %c1_0 = arith.constant 1 : index
-        air.herd @herd_0  tile (%arg13, %arg14) in (%arg15=%c20, %arg16=%c1_0) args(%arg17=%arg10, %arg18=%arg11, %arg19=%arg12) : memref<20xf32>, memref<20xf32>, memref<20xf32> {
-          %0 = memref.load %arg17[%arg13] : memref<20xf32>
-          %1 = memref.load %arg18[%arg13] : memref<20xf32>
+    air.launch (%arg3, %arg4) in (%arg5=%c1, %arg6=%c1) args(%arg7=%arg0, %arg8=%arg1, %arg9=%arg2) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
+      air.segment @matadd_0  args(%arg10=%arg7, %arg11=%arg8, %arg12=%arg9) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
+        %c2 = arith.constant 2 : index
+        air.herd @herd_0  tile (%arg13, %arg14) in (%arg15=%c2, %arg16=%c2) args(%arg17=%arg10, %arg18=%arg11, %arg19=%arg12) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
+          %0 = memref.load %arg17[%arg13, %arg14] : memref<2x2xf32>
+          %1 = memref.load %arg18[%arg13, %arg14] : memref<2x2xf32>
           %2 = arith.addf %0, %1 : f32
-          memref.store %2, %arg19[%arg13] : memref<20xf32>
+          memref.store %2, %arg19[%arg13, %arg14] : memref<2x2xf32>
         }
       }
     }
