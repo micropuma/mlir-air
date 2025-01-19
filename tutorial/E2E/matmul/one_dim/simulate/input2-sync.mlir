@@ -1,5 +1,5 @@
 module {
-  func.func @matadd(%arg0: memref<2x2xf32>, %arg1: memref<2x2xf32>, %arg2: memref<2x2xf32>) {
+  func.func @test(%arg0: memref<2x2xf32>, %arg1: memref<2x2xf32>, %arg2: memref<2x2xf32>) {
     %c2 = arith.constant 2 : index
     %async_token, %results = air.execute -> (memref<2x2xf32>) {
       %alloc = memref.alloc() : memref<2x2xf32>

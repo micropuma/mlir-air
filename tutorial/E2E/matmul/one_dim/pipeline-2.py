@@ -48,6 +48,7 @@ with air.ir.Context() as ctx, Location.unknown():
                 "canonicalize",
                 "cse",
                 "func.func(air-loop-fusion)",
+                "air-insert-launch-and-segment-around-herd",
             ]
         )
         + ")"
