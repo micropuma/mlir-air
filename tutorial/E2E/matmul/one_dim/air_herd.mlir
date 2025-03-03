@@ -6,9 +6,9 @@ module {
       air.execute_terminator %alloc : memref<2x2xf32>
     }
     %0 = air.launch async [%async_token] (%arg3, %arg4) in (%arg5=%c1, %arg6=%c1) args(%arg7=%arg0, %arg8=%arg1, %arg9=%results) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
-      %1 = air.segment @matadd_0 async  args(%arg10=%arg7, %arg11=%arg8, %arg12=%arg9) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> attributes {x_loc = 7 : i64, x_size = 10 : i64, y_loc = 2 : i64, y_size = 6 : i64} {
+      %1 = air.segment @matadd_0 async  args(%arg10=%arg7, %arg11=%arg8, %arg12=%arg9) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
         %c2 = arith.constant 2 : index
-        %2 = air.herd @herd_0 async  tile (%arg13, %arg14) in (%arg15=%c2, %arg16=%c2) args(%arg17=%arg10, %arg18=%arg11, %arg19=%arg12) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> attributes {x_loc = 7 : i64, y_loc = 2 : i64} {
+        %2 = air.herd @herd_0 async  tile (%arg13, %arg14) in (%arg15=%c2, %arg16=%c2) args(%arg17=%arg10, %arg18=%arg11, %arg19=%arg12) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
           %c0 = arith.constant 0 : index
           %cst = arith.constant 0.000000e+00 : f32
           %c1_2 = arith.constant 1 : index
@@ -66,4 +66,3 @@ module {
     return
   }
 }
-
