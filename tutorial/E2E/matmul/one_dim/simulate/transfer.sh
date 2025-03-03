@@ -1,3 +1,5 @@
 #!/bin/bash
 
-air-opt input.mlir --air-insert-launch-and-segment-around-herd -o input.mlir
+air-opt input2-sync.mlir --air-insert-launch-and-segment-around-herd \
+                   --air-dma-to-channel \
+                   -o input2-sync.mlir

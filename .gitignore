@@ -46,3 +46,6 @@ build-pcie/
 
 *.a 
 air_project
+
+/llvm/
+/ROCm-air-platforms/

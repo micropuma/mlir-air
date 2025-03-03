@@ -5,7 +5,8 @@ module {
     // Allocate temporary memory for result
     %alloc = memref.alloc() : memref<2x2xf32>
 
-    air.herd @herd_0  tile (%arg3, %arg4) in (%arg5=%c2, %arg6=%c2) args(%arg7=%arg0, %arg8=%arg1, %arg9=%alloc) : memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
+    air.herd @herd_0  tile (%arg3, %arg4) in (%arg5=%c2, %arg6=%c2) args(%arg7=%arg0, %arg8=%arg1, %arg9=%alloc) : 
+      memref<2x2xf32>, memref<2x2xf32>, memref<2x2xf32> {
       // Allocate result buffer for each tile and init it
       %c0 = arith.constant 0.0 : f32
       %c1 = arith.constant 1 : index
