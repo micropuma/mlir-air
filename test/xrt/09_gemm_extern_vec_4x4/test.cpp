@@ -104,6 +104,7 @@ int main(int argc, const char *argv[]) {
     std::cout << "Getting handle to kernel:" << kernelName << "\n";
   auto kernel = xrt::kernel(context, kernelName);
 
+  // 将数据通过xrt::bo对象传递给kernel
   auto bo_instr = xrt::bo(device, instr_v.size() * sizeof(int),
                           XCL_BO_FLAGS_CACHEABLE, kernel.group_id(1));
   auto bo_a =
@@ -155,13 +156,18 @@ int main(int argc, const char *argv[]) {
     }
     auto start = std::chrono::high_resolution_clock::now();
     unsigned int opcode = 3;
+    // 启动kernel句柄
     auto run = kernel(opcode, bo_instr, instr_v.size(), bo_a, bo_b, bo_c);
     run.wait();
     auto stop = std::chrono::high_resolution_clock::now();
 
     bo_c.sync(XCL_BO_SYNC_BO_FROM_DEVICE);
+
+    // 拷贝会计算结果
     memcpy(CVec.data(), bufC, (CVec.size() * sizeof(C_DATATYPE)));
     std::vector<C_DATATYPE> CVecRef(C_VOLUME);
+
+    // 验证计算结果的正确性
     if (VERIFY) {
       if (verbosity >= 1) {
         std::cout << "Verifying against reference matmul ..." << std::endl;

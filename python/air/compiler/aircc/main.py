@@ -123,6 +123,7 @@ def run_passes(pass_pipeline, mlir_module, opts, outputfile=None):
         with open(outputfile, "w") as g:
             g.write(str(mlir_module))
 
+# todo: 实现这个pipeline
 # 针对非npu平台的airrt，使用lower_airrt_to_airhost函数
 def lower_airrt_to_airhost(air_to_aie_module, air_placed_module, air_mlir_filename):
     # Split the input into one output per aie.device op 

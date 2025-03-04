@@ -1,0 +1,43 @@
+module {
+  airrt.module_metadata{
+    airrt.segment_metadata attributes {dma_allocations = [], sym_name = "matadd_0"}{
+      airrt.herd_metadata {dma_allocations = [{channel = 0 : i64, col = 0 : i64, id = 3 : i64, location = 7 : i64, row = 3 : i64}, {channel = 1 : i64, col = 0 : i64, id = 3 : i64, location = 7 : i64, row = 2 : i64}, {channel = 0 : i64, col = 0 : i64, id = 3 : i64, location = 10 : i64, row = 1 : i64}, {channel = 1 : i64, col = 0 : i64, id = 3 : i64, location = 10 : i64, row = 0 : i64}, {channel = 2 : i64, col = 0 : i64, id = 1 : i64, location = 7 : i64, row = 3 : i64}, {channel = 3 : i64, col = 0 : i64, id = 2 : i64, location = 7 : i64, row = 3 : i64}, {channel = 2 : i64, col = 0 : i64, id = 1 : i64, location = 10 : i64, row = 2 : i64}, {channel = 3 : i64, col = 0 : i64, id = 2 : i64, location = 10 : i64, row = 2 : i64}, {channel = 2 : i64, col = 0 : i64, id = 1 : i64, location = 11 : i64, row = 1 : i64}, {channel = 3 : i64, col = 0 : i64, id = 2 : i64, location = 11 : i64, row = 1 : i64}, {channel = 2 : i64, col = 0 : i64, id = 1 : i64, location = 18 : i64, row = 0 : i64}, {channel = 3 : i64, col = 0 : i64, id = 2 : i64, location = 18 : i64, row = 0 : i64}], sym_name = "herd_0"}
+    }
+  }
+  func.func @matadd(%arg0: memref<2x2xf32>, %arg1: memref<2x2xf32>, %arg2: memref<2x2xf32>) {
+    %c2_i64 = arith.constant 2 : i64
+    %c3_i32 = arith.constant 3 : i32
+    %c2_i32 = arith.constant 2 : i32
+    %c1_i64 = arith.constant 1 : i64
+    %c0_i64 = arith.constant 0 : i64
+    %c1_i32 = arith.constant 1 : i32
+    %c2 = arith.constant 2 : index
+    %alloc = memref.alloc() : memref<2x2xf32>
+    affine.for %arg3 = 0 to 1 {
+      affine.for %arg4 = 0 to 1 {
+        %p = airrt.segment_load "matadd_0" : i64
+        affine.for %arg5 = 0 to 1 {
+          %h = airrt.herd_load "herd_0" () : () -> i64
+          affine.for %arg6 = 0 to 1 {
+            affine.for %arg7 = 0 to 4 {
+              %0 = arith.remsi %arg7, %c2 : index
+              %1 = arith.divsi %arg7, %c2 : index
+              %2 = arith.index_cast %arg7 : index to i64
+              %3 = arith.index_cast %arg6 : index to i64
+              %4 = arith.index_cast %1 : index to i64
+              %5 = arith.index_cast %0 : index to i64
+              %6 = airrt.dma_memcpy_nd(%c1_i32, %2, %3, %arg0[%c0_i64, %c0_i64, %4, %5], [%c1_i64, %c1_i64, %c1_i64, %c1_i64], [%c0_i64, %c0_i64, %c2_i64]) : (i32, i64, i64, memref<2x2xf32>, [i64, i64, i64, i64], [i64, i64, i64, i64], [i64, i64, i64]) : !airrt.event
+              %7 = airrt.dma_memcpy_nd(%c2_i32, %2, %3, %arg1[%c0_i64, %c0_i64, %4, %5], [%c1_i64, %c1_i64, %c1_i64, %c1_i64], [%c0_i64, %c0_i64, %c2_i64]) : (i32, i64, i64, memref<2x2xf32>, [i64, i64, i64, i64], [i64, i64, i64, i64], [i64, i64, i64]) : !airrt.event
+              airrt.wait_all %7, %6
+              %8 = airrt.dma_memcpy_nd(%c3_i32, %2, %3, %alloc[%c0_i64, %c0_i64, %4, %5], [%c1_i64, %c1_i64, %c1_i64, %c1_i64], [%c0_i64, %c0_i64, %c2_i64]) : (i32, i64, i64, memref<2x2xf32>, [i64, i64, i64, i64], [i64, i64, i64, i64], [i64, i64, i64]) : !airrt.event
+              airrt.wait_all %8
+            } {air.herd = "inner"}
+          } {air.herd = "outer"}
+        }
+      }
+    } {affine_opt_label = "tiling"}
+    memref.copy %alloc, %arg2 : memref<2x2xf32> to memref<2x2xf32>
+    memref.dealloc %alloc : memref<2x2xf32>
+    return
+  }
+}
