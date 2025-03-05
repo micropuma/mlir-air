@@ -39,9 +39,9 @@ module {
             memref.dealloc %results_11 : memref<1x1xf32, 2>
           }
           %async_token_16 = air.execute [%async_token_14] {
-            memref.dealloc %results_8 : memref<1x1xf32, 2>
+            memref.dealloc %results_13 : memref<1x1xf32, 2>
           }
-          %5 = air.dma_memcpy_nd async [%async_token_16] (%arg27[%arg17, %arg18] [%c1_5, %c1_5] [%c2_6, %c1_5], %results_8[] [] []) {id = 3 : i32} : (memref<2x2xf32>, memref<1x1xf32, 2>)
+          %5 = air.dma_memcpy_nd async [%async_token_14] (%arg27[%arg17, %arg18] [%c1_5, %c1_5] [%c2_6, %c1_5], %results_8[] [] []) {id = 3 : i32} : (memref<2x2xf32>, memref<1x1xf32, 2>)
           %async_token_17 = air.execute [%5] {
             memref.dealloc %results_8 : memref<1x1xf32, 2>
           }

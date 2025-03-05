@@ -97,9 +97,8 @@ module @aie.matadd_0 {
       %2 = arith.addf %0, %1 : f32
       memref.store %2, %buf11[%c0, %c0] : memref<1x1xf32, 2>
       aie.use_lock(%lock_7_5_14, Release, 0)
-      aie.use_lock(%lock_7_5_15, Release, 1)
-      aie.use_lock(%lock_7_5_15, Release, 1)
       aie.use_lock(%lock_7_5, Release, 0)
+      aie.use_lock(%lock_7_5_15, Release, 1)
       cf.br ^bb1
     } {elf_file = "matadd_0_core_7_5.elf"}
     memref.global "public" @__air_herd_arg_6 : memref<2x2xf32>
@@ -143,9 +142,8 @@ module @aie.matadd_0 {
       %2 = arith.addf %0, %1 : f32
       memref.store %2, %buf8[%c0, %c0] : memref<1x1xf32, 2>
       aie.use_lock(%lock_7_4_12, Release, 0)
-      aie.use_lock(%lock_7_4_13, Release, 1)
-      aie.use_lock(%lock_7_4_13, Release, 1)
       aie.use_lock(%lock_7_4, Release, 0)
+      aie.use_lock(%lock_7_4_13, Release, 1)
       cf.br ^bb1
     } {elf_file = "matadd_0_core_7_4.elf"}
     memref.global "public" @__air_herd_arg_3 : memref<2x2xf32>
@@ -189,9 +187,8 @@ module @aie.matadd_0 {
       %2 = arith.addf %0, %1 : f32
       memref.store %2, %buf5[%c0, %c0] : memref<1x1xf32, 2>
       aie.use_lock(%lock_7_3_10, Release, 0)
-      aie.use_lock(%lock_7_3_11, Release, 1)
-      aie.use_lock(%lock_7_3_11, Release, 1)
       aie.use_lock(%lock_7_3, Release, 0)
+      aie.use_lock(%lock_7_3_11, Release, 1)
       cf.br ^bb1
     } {elf_file = "matadd_0_core_7_3.elf"}
     memref.global "public" @__air_herd_arg : memref<2x2xf32>
@@ -235,9 +232,8 @@ module @aie.matadd_0 {
       %2 = arith.addf %0, %1 : f32
       memref.store %2, %buf2[%c0, %c0] : memref<1x1xf32, 2>
       aie.use_lock(%lock_7_2_8, Release, 0)
-      aie.use_lock(%lock_7_2_9, Release, 1)
-      aie.use_lock(%lock_7_2_9, Release, 1)
       aie.use_lock(%lock_7_2, Release, 0)
+      aie.use_lock(%lock_7_2_9, Release, 1)
       cf.br ^bb1
     } {elf_file = "matadd_0_core_7_2.elf"}
     aie.flow(%tile_7_0, DMA : 0, %tile_7_5, DMA : 0)

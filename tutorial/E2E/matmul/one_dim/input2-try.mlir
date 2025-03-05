@@ -21,7 +21,7 @@ module {
       air.dma_memcpy_nd (%alloc_3[] [] [], %arg8[%arg3, %arg4] [%c1, %c1] [%c2_2, %c1]) {id = 2 : i32} : (memref<1x1xf32, 2>, memref<2x2xf32>)
       linalg.add ins(%alloc_2, %alloc_3 : memref<1x1xf32, 2>, memref<1x1xf32, 2>) outs(%alloc_1 : memref<1x1xf32, 2>)
       memref.dealloc %alloc_2 : memref<1x1xf32, 2>
-      memref.dealloc %alloc_1 : memref<1x1xf32, 2>
+      memref.dealloc %alloc_3 : memref<1x1xf32, 2>
 
       // do calculation
       air.dma_memcpy_nd (%arg9[%arg3, %arg4] [%c1, %c1] [%c2_2, %c1], %alloc_1[] [] []) {id = 3 : i32} : (memref<2x2xf32>, memref<1x1xf32, 2>) 

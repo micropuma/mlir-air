@@ -1,0 +1,35 @@
+module {
+  llvm.mlir.global internal constant @__airrt_string_graph_0("graph_0") {addr_space = 0 : i32}
+  func.func private @__airrt_segment_load(!llvm.ptr) -> i64 attributes {llvm.emit_c_interface}
+  llvm.mlir.global internal constant @__airrt_string_copyherd("copyherd") {addr_space = 0 : i32}
+  func.func private @__airrt_herd_load(!llvm.ptr) -> i64 attributes {llvm.emit_c_interface}
+  func.func @graph(%arg0: memref<256xi32>, %arg1: memref<256xi32>) attributes {llvm.emit_c_interface} {
+    %0 = llvm.mlir.zero : !llvm.ptr
+    %1 = llvm.mlir.addressof @__airrt_string_copyherd : !llvm.ptr
+    %2 = llvm.mlir.addressof @__airrt_string_graph_0 : !llvm.ptr
+    %c2_i32 = arith.constant 2 : i32
+    %c1_i64 = arith.constant 1 : i64
+    %c0_i64 = arith.constant 0 : i64
+    %c1_i32 = arith.constant 1 : i32
+    affine.for %arg2 = 0 to 1 {
+      affine.for %arg3 = 0 to 1 {
+        %3 = func.call @__airrt_segment_load(%2) : (!llvm.ptr) -> i64
+        affine.for %arg4 = 0 to 1 {
+          %4 = func.call @__airrt_herd_load(%1) : (!llvm.ptr) -> i64
+          affine.for %arg5 = 0 to 1 {
+            affine.for %arg6 = 0 to 1 {
+              %5 = arith.index_cast %arg6 : index to i64
+              %6 = arith.index_cast %arg5 : index to i64
+              %cast = memref.cast %arg0 : memref<256xi32> to memref<?xi32>
+              func.call @__airrt_dma_nd_memcpy_1d0i32(%0, %c1_i32, %5, %6, %cast, %c0_i64, %c0_i64, %c0_i64, %c0_i64, %c1_i64, %c1_i64, %c1_i64, %c1_i64, %c0_i64, %c0_i64, %c0_i64) : (!llvm.ptr, i32, i64, i64, memref<?xi32>, i64, i64, i64, i64, i64, i64, i64, i64, i64, i64, i64) -> ()
+              %cast_0 = memref.cast %arg1 : memref<256xi32> to memref<?xi32>
+              func.call @__airrt_dma_nd_memcpy_1d0i32(%0, %c2_i32, %5, %6, %cast_0, %c0_i64, %c0_i64, %c0_i64, %c0_i64, %c1_i64, %c1_i64, %c1_i64, %c1_i64, %c0_i64, %c0_i64, %c0_i64) : (!llvm.ptr, i32, i64, i64, memref<?xi32>, i64, i64, i64, i64, i64, i64, i64, i64, i64, i64, i64) -> ()
+            } {air.herd = "inner"}
+          } {air.herd = "outer"}
+        }
+      }
+    } {affine_opt_label = "tiling"}
+    return
+  }
+  func.func private @__airrt_dma_nd_memcpy_1d0i32(!llvm.ptr, i32, i64, i64, memref<?xi32>, i64, i64, i64, i64, i64, i64, i64, i64, i64, i64, i64) attributes {llvm.emit_c_interface}
+}

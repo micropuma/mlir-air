@@ -97,9 +97,8 @@ module {
       %2 = arith.addf %0, %1 : f32
       memref.store %2, %buf11[%c0, %c0] : memref<1x1xf32, 2>
       aie.use_lock(%lock_7_5_14, Release, 0)
-      aie.use_lock(%lock_7_5_15, Release, 1)
-      aie.use_lock(%lock_7_5_15, Release, 1)
       aie.use_lock(%lock_7_5, Release, 0)
+      aie.use_lock(%lock_7_5_15, Release, 1)
       cf.br ^bb1
     } {elf_file = "matadd_0_core_7_5.elf"}
     memref.global "public" @__air_herd_arg_6 : memref<2x2xf32>
@@ -143,9 +142,8 @@ module {
       %2 = arith.addf %0, %1 : f32
       memref.store %2, %buf8[%c0, %c0] : memref<1x1xf32, 2>
       aie.use_lock(%lock_7_4_12, Release, 0)
-      aie.use_lock(%lock_7_4_13, Release, 1)
-      aie.use_lock(%lock_7_4_13, Release, 1)
       aie.use_lock(%lock_7_4, Release, 0)
+      aie.use_lock(%lock_7_4_13, Release, 1)
       cf.br ^bb1
     } {elf_file = "matadd_0_core_7_4.elf"}
     memref.global "public" @__air_herd_arg_3 : memref<2x2xf32>
@@ -189,9 +187,8 @@ module {
       %2 = arith.addf %0, %1 : f32
       memref.store %2, %buf5[%c0, %c0] : memref<1x1xf32, 2>
       aie.use_lock(%lock_7_3_10, Release, 0)
-      aie.use_lock(%lock_7_3_11, Release, 1)
-      aie.use_lock(%lock_7_3_11, Release, 1)
       aie.use_lock(%lock_7_3, Release, 0)
+      aie.use_lock(%lock_7_3_11, Release, 1)
       cf.br ^bb1
     } {elf_file = "matadd_0_core_7_3.elf"}
     memref.global "public" @__air_herd_arg : memref<2x2xf32>
@@ -235,9 +232,8 @@ module {
       %2 = arith.addf %0, %1 : f32
       memref.store %2, %buf2[%c0, %c0] : memref<1x1xf32, 2>
       aie.use_lock(%lock_7_2_8, Release, 0)
-      aie.use_lock(%lock_7_2_9, Release, 1)
-      aie.use_lock(%lock_7_2_9, Release, 1)
       aie.use_lock(%lock_7_2, Release, 0)
+      aie.use_lock(%lock_7_2_9, Release, 1)
       cf.br ^bb1
     } {elf_file = "matadd_0_core_7_2.elf"}
     aie.flow(%tile_7_0, DMA : 0, %tile_7_5, DMA : 0)
@@ -398,9 +394,9 @@ module {
             memref.dealloc %results_8 : memref<1x1xf32, 2>
           }
           %async_token_13 = air.execute [%async_token_11] {
-            memref.dealloc %results_5 : memref<1x1xf32, 2>
+            memref.dealloc %results_10 : memref<1x1xf32, 2>
           }
-          %7 = air.dma_memcpy_nd async [%async_token_13] (%arg19[%4, %3] [%c1_3, %c1_3] [%c2, %c1_3], %results_5[] [] []) {id = 3 : i32} : (memref<2x2xf32>, memref<1x1xf32, 2>)
+          %7 = air.dma_memcpy_nd async [%async_token_11] (%arg19[%4, %3] [%c1_3, %c1_3] [%c2, %c1_3], %results_5[] [] []) {id = 3 : i32} : (memref<2x2xf32>, memref<1x1xf32, 2>)
           %async_token_14 = air.execute [%7] {
             memref.dealloc %results_5 : memref<1x1xf32, 2>
           }

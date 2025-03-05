@@ -233,7 +233,7 @@ with air.ir.Context() as ctx, Location.unknown():
         os.makedirs(tmp_dir)
 
     # Read the MLIR file
-    air_source_code = read_mlir_file("input2-try.mlir")
+    air_source_code = read_mlir_file("singleCore.mlir")
     air_module = Module.parse(air_source_code)
 
     pipeline = (
@@ -262,7 +262,7 @@ with air.ir.Context() as ctx, Location.unknown():
     pm = air.passmanager.PassManager.parse(pipeline)
     pm.run(air_module.operation)
 
-    with open("input2-sync.mlir", "w") as f:
+    with open("singlecore-sync.mlir", "w") as f:
         f.write(str(air_module))
 
     air_async_module = Module.parse(str(air_module))
@@ -282,7 +282,7 @@ with air.ir.Context() as ctx, Location.unknown():
     )
     pm = air.passmanager.PassManager.parse(pipeline)
     pm.run(air_async_module.operation)
-    with open("air_herd.mlir", "w") as f:
+    with open("dma-seg.mlir", "w") as f:
         f.write(str(air_async_module))
 
     ################################################
