@@ -233,7 +233,7 @@ with air.ir.Context() as ctx, Location.unknown():
         os.makedirs(tmp_dir)
 
     # Read the MLIR file
-    air_source_code = read_mlir_file("input2-try.mlir")
+    air_source_code = read_mlir_file("input2.mlir")
     air_module = Module.parse(air_source_code)
 
     pipeline = (
@@ -253,7 +253,7 @@ with air.ir.Context() as ctx, Location.unknown():
                 "canonicalize",
                 "cse",
                 "func.func(air-loop-fusion)",
-                "air-dma-to-channel",
+                "air-insert-launch-and-segment-around-herd",
             ]
         )
         + ")"
@@ -321,7 +321,7 @@ with air.ir.Context() as ctx, Location.unknown():
             [
                 "canonicalize",
                 "cse",
-                "air-to-aie{emit-while-loop=true row-offset=2 col-offset=7 device=xcvc1902 generate-shim-dma=true use-objectfifo=true}",
+                "air-to-aie{emit-while-loop=true row-offset=2 col-offset=7 device=xcvc1902 generate-shim-dma=true}",
                 "canonicalize",
             ]
         )

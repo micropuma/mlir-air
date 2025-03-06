@@ -1,8 +1,8 @@
 ; ModuleID = 'tmp/onedim.opt.bc'
 source_filename = "LLVMDialectModule"
 
-@__airrt_shim_location_data = internal constant [1024 x i64] [i64 18, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 11, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 10, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 7, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 18, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 11, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 10, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 7, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 10, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 10, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 7, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 7, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0]
-@__airrt_shim_channel_data = internal constant [1024 x i64] [i64 2, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 2, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 2, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 2, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 3, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 3, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 3, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 3, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 1, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 1, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0, i64 0]
+@__airrt_shim_location_data = internal constant [1024 x i64] zeroinitializer
+@__airrt_shim_channel_data = internal constant [1024 x i64] zeroinitializer
 @__airrt_shim_descriptor = internal constant { ptr, ptr } { ptr @__airrt_shim_location_data, ptr @__airrt_shim_channel_data }
 @__airrt_string_herd_0 = internal constant [6 x i8] c"herd_0"
 @__airrt_herd_descriptor = constant { i64, ptr, ptr } { i64 6, ptr @__airrt_string_herd_0, ptr @__airrt_shim_descriptor }
@@ -23,7 +23,7 @@ declare i64 @_mlir_ciface___airrt_segment_load(ptr) local_unnamed_addr
 declare i64 @_mlir_ciface___airrt_herd_load(ptr) local_unnamed_addr
 
 define void @matadd(ptr %0, ptr %1, i64 %2, i64 %3, i64 %4, i64 %5, i64 %6, ptr %7, ptr %8, i64 %9, i64 %10, i64 %11, i64 %12, i64 %13, ptr nocapture readnone %14, ptr nocapture writeonly %15, i64 %16, i64 %17, i64 %18, i64 %19, i64 %20) local_unnamed_addr {
-.preheader:
+.preheader21:
   %21 = alloca { ptr, ptr, i64, [2 x i64], [2 x i64] }, align 8
   %22 = alloca { ptr, ptr, i64, [2 x i64], [2 x i64] }, align 8
   %23 = alloca { ptr, ptr, i64, [2 x i64], [2 x i64] }, align 8
@@ -34,27 +34,7 @@ define void @matadd(ptr %0, ptr %1, i64 %2, i64 %3, i64 %4, i64 %5, i64 %6, ptr 
   %.fca.3.1.gep.i = getelementptr inbounds i8, ptr %23, i64 32
   %.fca.4.0.gep.i = getelementptr inbounds i8, ptr %23, i64 40
   %.fca.4.1.gep.i = getelementptr inbounds i8, ptr %23, i64 48
-  %.fca.1.gep.i4 = getelementptr inbounds i8, ptr %22, i64 8
-  %.fca.2.gep.i5 = getelementptr inbounds i8, ptr %22, i64 16
-  %.fca.3.0.gep.i6 = getelementptr inbounds i8, ptr %22, i64 24
-  %.fca.3.1.gep.i7 = getelementptr inbounds i8, ptr %22, i64 32
-  %.fca.4.0.gep.i8 = getelementptr inbounds i8, ptr %22, i64 40
-  %.fca.4.1.gep.i9 = getelementptr inbounds i8, ptr %22, i64 48
-  %.fca.1.gep.i10 = getelementptr inbounds i8, ptr %21, i64 8
-  %.fca.2.gep.i11 = getelementptr inbounds i8, ptr %21, i64 16
-  %.fca.3.0.gep.i12 = getelementptr inbounds i8, ptr %21, i64 24
-  %.fca.3.1.gep.i13 = getelementptr inbounds i8, ptr %21, i64 32
-  %.fca.4.0.gep.i14 = getelementptr inbounds i8, ptr %21, i64 40
-  %.fca.4.1.gep.i15 = getelementptr inbounds i8, ptr %21, i64 48
-  %25 = tail call i64 @_mlir_ciface___airrt_segment_load(ptr nonnull @__airrt_string_matadd_0)
-  %26 = tail call i64 @_mlir_ciface___airrt_herd_load(ptr nonnull @__airrt_string_herd_0)
-  br label %27
-
-27:                                               ; preds = %.preheader, %27
-  %28 = phi i64 [ 0, %.preheader ], [ %34, %27 ]
-  %29 = and i64 %28, 1
-  %30 = lshr i64 %28, 1
-  %31 = alloca i32, align 4
+  %25 = alloca i32, align 4
   call void @llvm.lifetime.start.p0(i64 56, ptr nonnull %23)
   store ptr %0, ptr %23, align 8
   store ptr %1, ptr %.fca.1.gep.i, align 8
@@ -63,39 +43,145 @@ define void @matadd(ptr %0, ptr %1, i64 %2, i64 %3, i64 %4, i64 %5, i64 %6, ptr 
   store i64 %4, ptr %.fca.3.1.gep.i, align 8
   store i64 %5, ptr %.fca.4.0.gep.i, align 8
   store i64 %6, ptr %.fca.4.1.gep.i, align 8
-  call void @_mlir_ciface___airrt_dma_nd_memcpy_2d0f32(ptr nonnull %31, i32 1, i64 %28, i64 0, ptr nonnull %23, i64 0, i64 0, i64 %30, i64 %29, i64 1, i64 1, i64 1, i64 1, i64 0, i64 0, i64 2)
+  call void @_mlir_ciface___airrt_dma_nd_memcpy_2d0f32(ptr nonnull %25, i32 4, i64 0, i64 0, ptr nonnull %23, i64 0, i64 0, i64 0, i64 0, i64 1, i64 1, i64 1, i64 1, i64 0, i64 0, i64 2)
   call void @llvm.lifetime.end.p0(i64 56, ptr nonnull %23)
+  %26 = alloca i32, align 4
+  call void @llvm.lifetime.start.p0(i64 56, ptr nonnull %23)
+  store ptr %0, ptr %23, align 8
+  store ptr %1, ptr %.fca.1.gep.i, align 8
+  store i64 %2, ptr %.fca.2.gep.i, align 8
+  store i64 %3, ptr %.fca.3.0.gep.i, align 8
+  store i64 %4, ptr %.fca.3.1.gep.i, align 8
+  store i64 %5, ptr %.fca.4.0.gep.i, align 8
+  store i64 %6, ptr %.fca.4.1.gep.i, align 8
+  call void @_mlir_ciface___airrt_dma_nd_memcpy_2d0f32(ptr nonnull %26, i32 4, i64 0, i64 1, ptr nonnull %23, i64 0, i64 0, i64 0, i64 1, i64 1, i64 1, i64 1, i64 1, i64 0, i64 0, i64 2)
+  call void @llvm.lifetime.end.p0(i64 56, ptr nonnull %23)
+  %27 = alloca i32, align 4
+  call void @llvm.lifetime.start.p0(i64 56, ptr nonnull %23)
+  store ptr %0, ptr %23, align 8
+  store ptr %1, ptr %.fca.1.gep.i, align 8
+  store i64 %2, ptr %.fca.2.gep.i, align 8
+  store i64 %3, ptr %.fca.3.0.gep.i, align 8
+  store i64 %4, ptr %.fca.3.1.gep.i, align 8
+  store i64 %5, ptr %.fca.4.0.gep.i, align 8
+  store i64 %6, ptr %.fca.4.1.gep.i, align 8
+  call void @_mlir_ciface___airrt_dma_nd_memcpy_2d0f32(ptr nonnull %27, i32 4, i64 1, i64 0, ptr nonnull %23, i64 0, i64 0, i64 1, i64 0, i64 1, i64 1, i64 1, i64 1, i64 0, i64 0, i64 2)
+  call void @llvm.lifetime.end.p0(i64 56, ptr nonnull %23)
+  %28 = alloca i32, align 4
+  call void @llvm.lifetime.start.p0(i64 56, ptr nonnull %23)
+  store ptr %0, ptr %23, align 8
+  store ptr %1, ptr %.fca.1.gep.i, align 8
+  store i64 %2, ptr %.fca.2.gep.i, align 8
+  store i64 %3, ptr %.fca.3.0.gep.i, align 8
+  store i64 %4, ptr %.fca.3.1.gep.i, align 8
+  store i64 %5, ptr %.fca.4.0.gep.i, align 8
+  store i64 %6, ptr %.fca.4.1.gep.i, align 8
+  call void @_mlir_ciface___airrt_dma_nd_memcpy_2d0f32(ptr nonnull %28, i32 4, i64 1, i64 1, ptr nonnull %23, i64 0, i64 0, i64 1, i64 1, i64 1, i64 1, i64 1, i64 1, i64 0, i64 0, i64 2)
+  call void @llvm.lifetime.end.p0(i64 56, ptr nonnull %23)
+  %.fca.1.gep.i6 = getelementptr inbounds i8, ptr %22, i64 8
+  %.fca.2.gep.i7 = getelementptr inbounds i8, ptr %22, i64 16
+  %.fca.3.0.gep.i8 = getelementptr inbounds i8, ptr %22, i64 24
+  %.fca.3.1.gep.i9 = getelementptr inbounds i8, ptr %22, i64 32
+  %.fca.4.0.gep.i10 = getelementptr inbounds i8, ptr %22, i64 40
+  %.fca.4.1.gep.i11 = getelementptr inbounds i8, ptr %22, i64 48
+  %29 = alloca i32, align 4
+  call void @llvm.lifetime.start.p0(i64 56, ptr nonnull %22)
+  store ptr %7, ptr %22, align 8
+  store ptr %8, ptr %.fca.1.gep.i6, align 8
+  store i64 %9, ptr %.fca.2.gep.i7, align 8
+  store i64 %10, ptr %.fca.3.0.gep.i8, align 8
+  store i64 %11, ptr %.fca.3.1.gep.i9, align 8
+  store i64 %12, ptr %.fca.4.0.gep.i10, align 8
+  store i64 %13, ptr %.fca.4.1.gep.i11, align 8
+  call void @_mlir_ciface___airrt_dma_nd_memcpy_2d0f32(ptr nonnull %29, i32 5, i64 0, i64 0, ptr nonnull %22, i64 0, i64 0, i64 0, i64 0, i64 1, i64 1, i64 1, i64 1, i64 0, i64 0, i64 2)
+  call void @llvm.lifetime.end.p0(i64 56, ptr nonnull %22)
+  %30 = alloca i32, align 4
+  call void @llvm.lifetime.start.p0(i64 56, ptr nonnull %22)
+  store ptr %7, ptr %22, align 8
+  store ptr %8, ptr %.fca.1.gep.i6, align 8
+  store i64 %9, ptr %.fca.2.gep.i7, align 8
+  store i64 %10, ptr %.fca.3.0.gep.i8, align 8
+  store i64 %11, ptr %.fca.3.1.gep.i9, align 8
+  store i64 %12, ptr %.fca.4.0.gep.i10, align 8
+  store i64 %13, ptr %.fca.4.1.gep.i11, align 8
+  call void @_mlir_ciface___airrt_dma_nd_memcpy_2d0f32(ptr nonnull %30, i32 5, i64 0, i64 1, ptr nonnull %22, i64 0, i64 0, i64 0, i64 1, i64 1, i64 1, i64 1, i64 1, i64 0, i64 0, i64 2)
+  call void @llvm.lifetime.end.p0(i64 56, ptr nonnull %22)
+  %31 = alloca i32, align 4
+  call void @llvm.lifetime.start.p0(i64 56, ptr nonnull %22)
+  store ptr %7, ptr %22, align 8
+  store ptr %8, ptr %.fca.1.gep.i6, align 8
+  store i64 %9, ptr %.fca.2.gep.i7, align 8
+  store i64 %10, ptr %.fca.3.0.gep.i8, align 8
+  store i64 %11, ptr %.fca.3.1.gep.i9, align 8
+  store i64 %12, ptr %.fca.4.0.gep.i10, align 8
+  store i64 %13, ptr %.fca.4.1.gep.i11, align 8
+  call void @_mlir_ciface___airrt_dma_nd_memcpy_2d0f32(ptr nonnull %31, i32 5, i64 1, i64 0, ptr nonnull %22, i64 0, i64 0, i64 1, i64 0, i64 1, i64 1, i64 1, i64 1, i64 0, i64 0, i64 2)
+  call void @llvm.lifetime.end.p0(i64 56, ptr nonnull %22)
   %32 = alloca i32, align 4
   call void @llvm.lifetime.start.p0(i64 56, ptr nonnull %22)
   store ptr %7, ptr %22, align 8
-  store ptr %8, ptr %.fca.1.gep.i4, align 8
-  store i64 %9, ptr %.fca.2.gep.i5, align 8
-  store i64 %10, ptr %.fca.3.0.gep.i6, align 8
-  store i64 %11, ptr %.fca.3.1.gep.i7, align 8
-  store i64 %12, ptr %.fca.4.0.gep.i8, align 8
-  store i64 %13, ptr %.fca.4.1.gep.i9, align 8
-  call void @_mlir_ciface___airrt_dma_nd_memcpy_2d0f32(ptr nonnull %32, i32 2, i64 %28, i64 0, ptr nonnull %22, i64 0, i64 0, i64 %30, i64 %29, i64 1, i64 1, i64 1, i64 1, i64 0, i64 0, i64 2)
+  store ptr %8, ptr %.fca.1.gep.i6, align 8
+  store i64 %9, ptr %.fca.2.gep.i7, align 8
+  store i64 %10, ptr %.fca.3.0.gep.i8, align 8
+  store i64 %11, ptr %.fca.3.1.gep.i9, align 8
+  store i64 %12, ptr %.fca.4.0.gep.i10, align 8
+  store i64 %13, ptr %.fca.4.1.gep.i11, align 8
+  call void @_mlir_ciface___airrt_dma_nd_memcpy_2d0f32(ptr nonnull %32, i32 5, i64 1, i64 1, ptr nonnull %22, i64 0, i64 0, i64 1, i64 1, i64 1, i64 1, i64 1, i64 1, i64 0, i64 0, i64 2)
   call void @llvm.lifetime.end.p0(i64 56, ptr nonnull %22)
-  call void @_mlir_ciface___airrt_wait_all_0_2(ptr nonnull %32, ptr nonnull %31)
+  %.fca.1.gep.i12 = getelementptr inbounds i8, ptr %21, i64 8
+  %.fca.2.gep.i13 = getelementptr inbounds i8, ptr %21, i64 16
+  %.fca.3.0.gep.i14 = getelementptr inbounds i8, ptr %21, i64 24
+  %.fca.3.1.gep.i15 = getelementptr inbounds i8, ptr %21, i64 32
+  %.fca.4.0.gep.i16 = getelementptr inbounds i8, ptr %21, i64 40
+  %.fca.4.1.gep.i17 = getelementptr inbounds i8, ptr %21, i64 48
   %33 = alloca i32, align 4
   call void @llvm.lifetime.start.p0(i64 56, ptr nonnull %21)
   store ptr %24, ptr %21, align 8
-  store ptr %24, ptr %.fca.1.gep.i10, align 8
-  store i64 0, ptr %.fca.2.gep.i11, align 8
-  store i64 2, ptr %.fca.3.0.gep.i12, align 8
-  store i64 2, ptr %.fca.3.1.gep.i13, align 8
-  store i64 2, ptr %.fca.4.0.gep.i14, align 8
-  store i64 1, ptr %.fca.4.1.gep.i15, align 8
-  call void @_mlir_ciface___airrt_dma_nd_memcpy_2d0f32(ptr nonnull %33, i32 3, i64 %28, i64 0, ptr nonnull %21, i64 0, i64 0, i64 %30, i64 %29, i64 1, i64 1, i64 1, i64 1, i64 0, i64 0, i64 2)
+  store ptr %24, ptr %.fca.1.gep.i12, align 8
+  store i64 0, ptr %.fca.2.gep.i13, align 8
+  store i64 2, ptr %.fca.3.0.gep.i14, align 8
+  store i64 2, ptr %.fca.3.1.gep.i15, align 8
+  store i64 2, ptr %.fca.4.0.gep.i16, align 8
+  store i64 1, ptr %.fca.4.1.gep.i17, align 8
+  call void @_mlir_ciface___airrt_dma_nd_memcpy_2d0f32(ptr nonnull %33, i32 6, i64 0, i64 0, ptr nonnull %21, i64 0, i64 0, i64 0, i64 0, i64 1, i64 1, i64 1, i64 1, i64 0, i64 0, i64 2)
   call void @llvm.lifetime.end.p0(i64 56, ptr nonnull %21)
-  call void @_mlir_ciface___airrt_wait_all_0_1(ptr nonnull %33)
-  %34 = add nuw nsw i64 %28, 1
-  %35 = icmp ult i64 %28, 3
-  br i1 %35, label %27, label %.critedge
-
-.critedge:                                        ; preds = %27
-  %36 = getelementptr float, ptr %15, i64 %16
-  call void @llvm.memcpy.p0.p0.i64(ptr noundef nonnull align 1 dereferenceable(16) %36, ptr noundef nonnull align 1 dereferenceable(16) %24, i64 16, i1 false)
+  %34 = alloca i32, align 4
+  call void @llvm.lifetime.start.p0(i64 56, ptr nonnull %21)
+  store ptr %24, ptr %21, align 8
+  store ptr %24, ptr %.fca.1.gep.i12, align 8
+  store i64 0, ptr %.fca.2.gep.i13, align 8
+  store i64 2, ptr %.fca.3.0.gep.i14, align 8
+  store i64 2, ptr %.fca.3.1.gep.i15, align 8
+  store i64 2, ptr %.fca.4.0.gep.i16, align 8
+  store i64 1, ptr %.fca.4.1.gep.i17, align 8
+  call void @_mlir_ciface___airrt_dma_nd_memcpy_2d0f32(ptr nonnull %34, i32 6, i64 0, i64 1, ptr nonnull %21, i64 0, i64 0, i64 0, i64 1, i64 1, i64 1, i64 1, i64 1, i64 0, i64 0, i64 2)
+  call void @llvm.lifetime.end.p0(i64 56, ptr nonnull %21)
+  %35 = alloca i32, align 4
+  call void @llvm.lifetime.start.p0(i64 56, ptr nonnull %21)
+  store ptr %24, ptr %21, align 8
+  store ptr %24, ptr %.fca.1.gep.i12, align 8
+  store i64 0, ptr %.fca.2.gep.i13, align 8
+  store i64 2, ptr %.fca.3.0.gep.i14, align 8
+  store i64 2, ptr %.fca.3.1.gep.i15, align 8
+  store i64 2, ptr %.fca.4.0.gep.i16, align 8
+  store i64 1, ptr %.fca.4.1.gep.i17, align 8
+  call void @_mlir_ciface___airrt_dma_nd_memcpy_2d0f32(ptr nonnull %35, i32 6, i64 1, i64 0, ptr nonnull %21, i64 0, i64 0, i64 1, i64 0, i64 1, i64 1, i64 1, i64 1, i64 0, i64 0, i64 2)
+  call void @llvm.lifetime.end.p0(i64 56, ptr nonnull %21)
+  %36 = alloca i32, align 4
+  call void @llvm.lifetime.start.p0(i64 56, ptr nonnull %21)
+  store ptr %24, ptr %21, align 8
+  store ptr %24, ptr %.fca.1.gep.i12, align 8
+  store i64 0, ptr %.fca.2.gep.i13, align 8
+  store i64 2, ptr %.fca.3.0.gep.i14, align 8
+  store i64 2, ptr %.fca.3.1.gep.i15, align 8
+  store i64 2, ptr %.fca.4.0.gep.i16, align 8
+  store i64 1, ptr %.fca.4.1.gep.i17, align 8
+  call void @_mlir_ciface___airrt_dma_nd_memcpy_2d0f32(ptr nonnull %36, i32 6, i64 1, i64 1, ptr nonnull %21, i64 0, i64 0, i64 1, i64 1, i64 1, i64 1, i64 1, i64 1, i64 0, i64 0, i64 2)
+  call void @llvm.lifetime.end.p0(i64 56, ptr nonnull %21)
+  %37 = call i64 @_mlir_ciface___airrt_segment_load(ptr nonnull @__airrt_string_matadd_0)
+  %38 = call i64 @_mlir_ciface___airrt_herd_load(ptr nonnull @__airrt_string_herd_0)
+  %39 = getelementptr float, ptr %15, i64 %16
+  call void @llvm.memcpy.p0.p0.i64(ptr noundef nonnull align 1 dereferenceable(16) %39, ptr noundef nonnull align 1 dereferenceable(16) %24, i64 16, i1 false)
   call void @free(ptr %24)
   ret void
 }
@@ -136,10 +222,6 @@ define void @_mlir_ciface_matadd(ptr nocapture readonly %0, ptr nocapture readon
 }
 
 declare void @_mlir_ciface___airrt_dma_nd_memcpy_2d0f32(ptr, i32, i64, i64, ptr, i64, i64, i64, i64, i64, i64, i64, i64, i64, i64, i64) local_unnamed_addr
-
-declare void @_mlir_ciface___airrt_wait_all_0_2(ptr, ptr) local_unnamed_addr
-
-declare void @_mlir_ciface___airrt_wait_all_0_1(ptr) local_unnamed_addr
 
 ; Function Attrs: nocallback nofree nounwind willreturn memory(argmem: readwrite)
 declare void @llvm.memcpy.p0.p0.i64(ptr noalias nocapture writeonly, ptr noalias nocapture readonly, i64, i1 immarg) #2

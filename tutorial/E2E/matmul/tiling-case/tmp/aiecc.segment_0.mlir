@@ -87,31 +87,15 @@ module @aie.segment_0 {
       %c0_i32 = arith.constant 0 : i32
       %c64 = arith.constant 64 : index
       %c32 = arith.constant 32 : index
-      %c1 = arith.constant 1 : index
       %c0 = arith.constant 0 : index
       cf.br ^bb1
     ^bb1:  // 2 preds: ^bb0, ^bb1
       aie.use_lock(%lock_7_5_15, Acquire, 0)
-      scf.for %arg0 = %c0 to %c32 step %c1 {
-        scf.for %arg1 = %c0 to %c32 step %c1 {
-          memref.store %c0_i32, %buf11[%arg0, %arg1] : memref<32x32xi32, 2>
-        }
-      }
+      func.call @linalg_fill_i32_view32x32xi32as2(%c0_i32, %buf11) : (i32, memref<32x32xi32, 2>) -> ()
       scf.for %arg0 = %c0 to %c64 step %c32 {
         aie.use_lock(%lock_7_5_14, Acquire, 1)
         aie.use_lock(%lock_7_5, Acquire, 1)
-        scf.for %arg1 = %c0 to %c32 step %c1 {
-          scf.for %arg2 = %c0 to %c32 step %c1 {
-            scf.for %arg3 = %c0 to %c32 step %c1 {
-              %0 = memref.load %buf10[%arg1, %arg3] : memref<32x32xi32, 2>
-              %1 = memref.load %buf9[%arg3, %arg2] : memref<32x32xi32, 2>
-              %2 = memref.load %buf11[%arg1, %arg2] : memref<32x32xi32, 2>
-              %3 = arith.muli %0, %1 : i32
-              %4 = arith.addi %2, %3 : i32
-              memref.store %4, %buf11[%arg1, %arg2] : memref<32x32xi32, 2>
-            }
-          }
-        }
+        func.call @linalg_matmul_view32x32xi32as2_view32x32xi32as2_view32x32xi32as2(%buf10, %buf9, %buf11) : (memref<32x32xi32, 2>, memref<32x32xi32, 2>, memref<32x32xi32, 2>) -> ()
         aie.use_lock(%lock_7_5_14, Release, 0)
         aie.use_lock(%lock_7_5, Release, 0)
       }
@@ -149,31 +133,15 @@ module @aie.segment_0 {
       %c0_i32 = arith.constant 0 : i32
       %c64 = arith.constant 64 : index
       %c32 = arith.constant 32 : index
-      %c1 = arith.constant 1 : index
       %c0 = arith.constant 0 : index
       cf.br ^bb1
     ^bb1:  // 2 preds: ^bb0, ^bb1
       aie.use_lock(%lock_7_4_13, Acquire, 0)
-      scf.for %arg0 = %c0 to %c32 step %c1 {
-        scf.for %arg1 = %c0 to %c32 step %c1 {
-          memref.store %c0_i32, %buf8[%arg0, %arg1] : memref<32x32xi32, 2>
-        }
-      }
+      func.call @linalg_fill_i32_view32x32xi32as2(%c0_i32, %buf8) : (i32, memref<32x32xi32, 2>) -> ()
       scf.for %arg0 = %c0 to %c64 step %c32 {
         aie.use_lock(%lock_7_4_12, Acquire, 1)
         aie.use_lock(%lock_7_4, Acquire, 1)
-        scf.for %arg1 = %c0 to %c32 step %c1 {
-          scf.for %arg2 = %c0 to %c32 step %c1 {
-            scf.for %arg3 = %c0 to %c32 step %c1 {
-              %0 = memref.load %buf7[%arg1, %arg3] : memref<32x32xi32, 2>
-              %1 = memref.load %buf6[%arg3, %arg2] : memref<32x32xi32, 2>
-              %2 = memref.load %buf8[%arg1, %arg2] : memref<32x32xi32, 2>
-              %3 = arith.muli %0, %1 : i32
-              %4 = arith.addi %2, %3 : i32
-              memref.store %4, %buf8[%arg1, %arg2] : memref<32x32xi32, 2>
-            }
-          }
-        }
+        func.call @linalg_matmul_view32x32xi32as2_view32x32xi32as2_view32x32xi32as2(%buf7, %buf6, %buf8) : (memref<32x32xi32, 2>, memref<32x32xi32, 2>, memref<32x32xi32, 2>) -> ()
         aie.use_lock(%lock_7_4_12, Release, 0)
         aie.use_lock(%lock_7_4, Release, 0)
       }
@@ -211,31 +179,15 @@ module @aie.segment_0 {
       %c0_i32 = arith.constant 0 : i32
       %c64 = arith.constant 64 : index
       %c32 = arith.constant 32 : index
-      %c1 = arith.constant 1 : index
       %c0 = arith.constant 0 : index
       cf.br ^bb1
     ^bb1:  // 2 preds: ^bb0, ^bb1
       aie.use_lock(%lock_7_3_11, Acquire, 0)
-      scf.for %arg0 = %c0 to %c32 step %c1 {
-        scf.for %arg1 = %c0 to %c32 step %c1 {
-          memref.store %c0_i32, %buf5[%arg0, %arg1] : memref<32x32xi32, 2>
-        }
-      }
+      func.call @linalg_fill_i32_view32x32xi32as2(%c0_i32, %buf5) : (i32, memref<32x32xi32, 2>) -> ()
       scf.for %arg0 = %c0 to %c64 step %c32 {
         aie.use_lock(%lock_7_3_10, Acquire, 1)
         aie.use_lock(%lock_7_3, Acquire, 1)
-        scf.for %arg1 = %c0 to %c32 step %c1 {
-          scf.for %arg2 = %c0 to %c32 step %c1 {
-            scf.for %arg3 = %c0 to %c32 step %c1 {
-              %0 = memref.load %buf4[%arg1, %arg3] : memref<32x32xi32, 2>
-              %1 = memref.load %buf3[%arg3, %arg2] : memref<32x32xi32, 2>
-              %2 = memref.load %buf5[%arg1, %arg2] : memref<32x32xi32, 2>
-              %3 = arith.muli %0, %1 : i32
-              %4 = arith.addi %2, %3 : i32
-              memref.store %4, %buf5[%arg1, %arg2] : memref<32x32xi32, 2>
-            }
-          }
-        }
+        func.call @linalg_matmul_view32x32xi32as2_view32x32xi32as2_view32x32xi32as2(%buf4, %buf3, %buf5) : (memref<32x32xi32, 2>, memref<32x32xi32, 2>, memref<32x32xi32, 2>) -> ()
         aie.use_lock(%lock_7_3_10, Release, 0)
         aie.use_lock(%lock_7_3, Release, 0)
       }
@@ -273,37 +225,23 @@ module @aie.segment_0 {
       %c0_i32 = arith.constant 0 : i32
       %c64 = arith.constant 64 : index
       %c32 = arith.constant 32 : index
-      %c1 = arith.constant 1 : index
       %c0 = arith.constant 0 : index
       cf.br ^bb1
     ^bb1:  // 2 preds: ^bb0, ^bb1
       aie.use_lock(%lock_7_2_9, Acquire, 0)
-      scf.for %arg0 = %c0 to %c32 step %c1 {
-        scf.for %arg1 = %c0 to %c32 step %c1 {
-          memref.store %c0_i32, %buf2[%arg0, %arg1] : memref<32x32xi32, 2>
-        }
-      }
+      func.call @linalg_fill_i32_view32x32xi32as2(%c0_i32, %buf2) : (i32, memref<32x32xi32, 2>) -> ()
       scf.for %arg0 = %c0 to %c64 step %c32 {
         aie.use_lock(%lock_7_2_8, Acquire, 1)
         aie.use_lock(%lock_7_2, Acquire, 1)
-        scf.for %arg1 = %c0 to %c32 step %c1 {
-          scf.for %arg2 = %c0 to %c32 step %c1 {
-            scf.for %arg3 = %c0 to %c32 step %c1 {
-              %0 = memref.load %buf1[%arg1, %arg3] : memref<32x32xi32, 2>
-              %1 = memref.load %buf0[%arg3, %arg2] : memref<32x32xi32, 2>
-              %2 = memref.load %buf2[%arg1, %arg2] : memref<32x32xi32, 2>
-              %3 = arith.muli %0, %1 : i32
-              %4 = arith.addi %2, %3 : i32
-              memref.store %4, %buf2[%arg1, %arg2] : memref<32x32xi32, 2>
-            }
-          }
-        }
+        func.call @linalg_matmul_view32x32xi32as2_view32x32xi32as2_view32x32xi32as2(%buf1, %buf0, %buf2) : (memref<32x32xi32, 2>, memref<32x32xi32, 2>, memref<32x32xi32, 2>) -> ()
         aie.use_lock(%lock_7_2_8, Release, 0)
         aie.use_lock(%lock_7_2, Release, 0)
       }
       aie.use_lock(%lock_7_2_9, Release, 1)
       cf.br ^bb1
     } {elf_file = "segment_0_core_7_2.elf"}
+    func.func private @linalg_fill_i32_view32x32xi32as2(i32, memref<32x32xi32, 2>)
+    func.func private @linalg_matmul_view32x32xi32as2_view32x32xi32as2_view32x32xi32as2(memref<32x32xi32, 2>, memref<32x32xi32, 2>, memref<32x32xi32, 2>)
     aie.flow(%tile_7_0, DMA : 0, %tile_7_5, DMA : 0)
     aie.flow(%tile_7_0, DMA : 1, %tile_7_5, DMA : 1)
     aie.flow(%tile_7_5, DMA : 0, %tile_7_0, DMA : 0)
@@ -414,3 +352,4 @@ module @aie.segment_0 {
     }
   } {sym_name = "segment_0"}
 }
+

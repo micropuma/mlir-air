@@ -7,9 +7,9 @@ module {
     air.channel.put  @channel_0[%c0, %c0] (%arg0[] [] []) {id = 1 : i32} : (memref<256xi32>)
     air.channel.get  @channel_1[%c0, %c0] (%arg1[] [] []) {id = 2 : i32} : (memref<256xi32>)
     air.launch (%arg2, %arg3) in (%arg4=%c1, %arg5=%c1) {
-      air.segment @graph_0  attributes {x_loc = 7 : i64, x_size = 10 : i64, y_loc = 2 : i64, y_size = 6 : i64} {
+      air.segment @graph_0  {
         %c1_0 = arith.constant 1 : index
-        air.herd @copyherd  tile (%arg6, %arg7) in (%arg8=%c1_0, %arg9=%c1_0) attributes {x_loc = 7 : i64, y_loc = 2 : i64} {
+        air.herd @copyherd  tile (%arg6, %arg7) in (%arg8=%c1_0, %arg9=%c1_0) {
           %alloc = memref.alloc() {sym_name = "scratch"} : memref<256xi32, 2>
           %alloc_1 = memref.alloc() {sym_name = "scratch_copy"} : memref<256xi32, 2>
           air.channel.get  @channel_0[%arg6, %arg7] (%alloc[] [] []) {id = 3 : i32} : (memref<256xi32, 2>)

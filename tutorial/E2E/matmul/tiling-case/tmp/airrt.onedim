@@ -8,6 +8,8 @@ module {
       airrt.herd_metadata {dma_allocations = [{channel = 0 : i64, col = 0 : i64, id = 5 : i64, location = 7 : i64, row = 3 : i64}, {channel = 1 : i64, col = 0 : i64, id = 5 : i64, location = 7 : i64, row = 2 : i64}, {channel = 0 : i64, col = 0 : i64, id = 5 : i64, location = 10 : i64, row = 1 : i64}, {channel = 1 : i64, col = 0 : i64, id = 5 : i64, location = 10 : i64, row = 0 : i64}, {channel = 2 : i64, col = 0 : i64, id = 2 : i64, location = 7 : i64, row = 3 : i64}, {channel = 3 : i64, col = 0 : i64, id = 4 : i64, location = 7 : i64, row = 3 : i64}, {channel = 2 : i64, col = 0 : i64, id = 2 : i64, location = 10 : i64, row = 2 : i64}, {channel = 3 : i64, col = 0 : i64, id = 3 : i64, location = 10 : i64, row = 2 : i64}, {channel = 2 : i64, col = 0 : i64, id = 1 : i64, location = 11 : i64, row = 1 : i64}, {channel = 3 : i64, col = 0 : i64, id = 4 : i64, location = 11 : i64, row = 1 : i64}, {channel = 2 : i64, col = 0 : i64, id = 1 : i64, location = 18 : i64, row = 0 : i64}, {channel = 3 : i64, col = 0 : i64, id = 3 : i64, location = 18 : i64, row = 0 : i64}], sym_name = "herd_0"}
     }
   }
+  func.func private @linalg_fill_i32_view32x32xi32as2(i32, memref<32x32xi32, 2>) attributes {link_with = "mm.o", llvm.emit_c_interface}
+  func.func private @linalg_matmul_view32x32xi32as2_view32x32xi32as2_view32x32xi32as2(memref<32x32xi32, 2>, memref<32x32xi32, 2>, memref<32x32xi32, 2>) attributes {link_with = "mm.o", llvm.emit_c_interface}
   func.func @forward(%arg0: memref<64x64xi32>, %arg1: memref<64x64xi32>, %arg2: memref<64x64xi32>) {
     %c32_i64 = arith.constant 32 : i64
     %c64_i64 = arith.constant 64 : i64
@@ -37,11 +39,7 @@ module {
               %2 = arith.muli %1, %c32 : index
               %3 = arith.muli %0, %c32 : index
               %alloc_0 = memref.alloc() : memref<32x32xi32, 2>
-              scf.for %arg8 = %c0 to %c32 step %c1 {
-                scf.for %arg9 = %c0 to %c32 step %c1 {
-                  memref.store %c0_i32, %alloc_0[%arg8, %arg9] : memref<32x32xi32, 2>
-                }
-              }
+              func.call @linalg_fill_i32_view32x32xi32as2(%c0_i32, %alloc_0) : (i32, memref<32x32xi32, 2>) -> ()
               %4 = airrt.wait_all : !airrt.event
               %5 = scf.for %arg8 = %c0 to %c64 step %c32 iter_args(%arg9 = %4) -> (!airrt.event) {
                 %alloc_1 = memref.alloc() : memref<32x32xi32, 2>
@@ -89,18 +87,7 @@ module {
                   scf.yield %31 : !airrt.event
                 }
                 airrt.wait_all %25, %18
-                scf.for %arg10 = %c0 to %c32 step %c1 {
-                  scf.for %arg11 = %c0 to %c32 step %c1 {
-                    scf.for %arg12 = %c0 to %c32 step %c1 {
-                      %27 = memref.load %alloc_1[%arg10, %arg12] : memref<32x32xi32, 2>
-                      %28 = memref.load %alloc_2[%arg12, %arg11] : memref<32x32xi32, 2>
-                      %29 = memref.load %alloc_0[%arg10, %arg11] : memref<32x32xi32, 2>
-                      %30 = arith.muli %27, %28 : i32
-                      %31 = arith.addi %29, %30 : i32
-                      memref.store %31, %alloc_0[%arg10, %arg11] : memref<32x32xi32, 2>
-                    }
-                  }
-                }
+                func.call @linalg_matmul_view32x32xi32as2_view32x32xi32as2_view32x32xi32as2(%alloc_1, %alloc_2, %alloc_0) : (memref<32x32xi32, 2>, memref<32x32xi32, 2>, memref<32x32xi32, 2>) -> ()
                 %26 = airrt.wait_all : !airrt.event
                 memref.dealloc %alloc_1 : memref<32x32xi32, 2>
                 memref.dealloc %alloc_2 : memref<32x32xi32, 2>

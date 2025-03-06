@@ -3299,6 +3299,7 @@ public:
       ShimTileAllocator shimTileAlloc(device.getTargetModel());
       std::map<std::string, std::string> chan_to_chan_map;
 
+      // 选择使用objectfifo抽象层级，而不是flow。
       if (clUseObjFifo) {
         cloneL2AndL3MemcpysToDeviceOp(builder, device, module, true, false);
         specializeHerdAffineIf(device);

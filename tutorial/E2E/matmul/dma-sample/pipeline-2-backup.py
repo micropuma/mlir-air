@@ -233,39 +233,9 @@ with air.ir.Context() as ctx, Location.unknown():
         os.makedirs(tmp_dir)
 
     # Read the MLIR file
-    air_source_code = read_mlir_file("input2-try.mlir")
+    air_source_code = read_mlir_file("singleCore.mlir")
     air_module = Module.parse(air_source_code)
-
-    pipeline = (
-        "builtin.module("
-        + ",".join(
-            [
-                "air-dependency",
-                "air-dependency-schedule-opt",
-                "air-specialize-dma-broadcast",
-                "canonicalize",
-                "cse",
-                "air-dependency-canonicalize",
-                "canonicalize",
-                "cse",
-                "func.func(air-split-l2-memref)",
-                "air-isolate-async-dma-loop-nests",
-                "canonicalize",
-                "cse",
-                "func.func(air-loop-fusion)",
-                "air-dma-to-channel",
-            ]
-        )
-        + ")"
-    )
-
-    pm = air.passmanager.PassManager.parse(pipeline)
-    pm.run(air_module.operation)
-
-    with open("input2-sync.mlir", "w") as f:
-        f.write(str(air_module))
-
-    air_async_module = Module.parse(str(air_module))
+ 
     pipeline = (
         "builtin.module("
         + ",".join(
@@ -281,15 +251,15 @@ with air.ir.Context() as ctx, Location.unknown():
         + ")"
     )
     pm = air.passmanager.PassManager.parse(pipeline)
-    pm.run(air_async_module.operation)
-    with open("air_herd.mlir", "w") as f:
-        f.write(str(air_async_module))
+    pm.run(air_module.operation)
+    with open("dma-seg.mlir", "w") as f:
+        f.write(str(air_module))
 
     ################################################
     ## Place herd to segment
     ################################################
 
-    air_placed_module = Module.parse(str(air_async_module))
+    air_placed_module = Module.parse(str(air_module))
     pipeline = (
         "builtin.module("
         + ",".join(
@@ -321,7 +291,7 @@ with air.ir.Context() as ctx, Location.unknown():
             [
                 "canonicalize",
                 "cse",
-                "air-to-aie{emit-while-loop=true row-offset=2 col-offset=7 device=xcvc1902 generate-shim-dma=true use-objectfifo=true}",
+                "air-to-aie{emit-while-loop=true row-offset=2 col-offset=7 device=xcvc1902 generate-shim-dma=true}",
                 "canonicalize",
             ]
         )

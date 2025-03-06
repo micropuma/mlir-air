@@ -235,11 +235,29 @@ with air.ir.Context() as ctx, Location.unknown():
     # Read the MLIR file
     air_source_code = read_mlir_file("singleCore.mlir")
     air_module = Module.parse(air_source_code)
- 
+
+    # pipeline = (
+    #     "builtin.module("
+    #     + ",".join(
+    #         [
+    #             "air-dma-to-channel",
+    #         ]
+    #     )
+    #     + ")"
+    # )
+
+    # pm = air.passmanager.PassManager.parse(pipeline)
+    # pm.run(air_module.operation)
+
+    # with open("input2-sync.mlir", "w") as f:
+    #     f.write(str(air_module))
+
+    air_async_module = Module.parse(str(air_module))
     pipeline = (
         "builtin.module("
         + ",".join(
             [
+                "air-dma-to-channel",
                 "air-insert-launch-and-segment-around-herd",
                 "func.func(air-lower-herd-parallel)",  # 这里修正，包裹在 func.func 里
                 "canonicalize",
@@ -251,15 +269,15 @@ with air.ir.Context() as ctx, Location.unknown():
         + ")"
     )
     pm = air.passmanager.PassManager.parse(pipeline)
-    pm.run(air_module.operation)
-    with open("dma-seg.mlir", "w") as f:
-        f.write(str(air_module))
+    pm.run(air_async_module.operation)
+    with open("air_herd.mlir", "w") as f:
+        f.write(str(air_async_module))
 
     ################################################
     ## Place herd to segment
     ################################################
 
-    air_placed_module = Module.parse(str(air_module))
+    air_placed_module = Module.parse(str(air_async_module))
     pipeline = (
         "builtin.module("
         + ",".join(
@@ -291,7 +309,7 @@ with air.ir.Context() as ctx, Location.unknown():
             [
                 "canonicalize",
                 "cse",
-                "air-to-aie{emit-while-loop=true row-offset=2 col-offset=7 device=xcvc1902 generate-shim-dma=true}",
+                "air-to-aie{emit-while-loop=true row-offset=2 col-offset=7 device=xcvc1902 generate-shim-dma=true use-objectfifo=true}",
                 "canonicalize",
             ]
         )

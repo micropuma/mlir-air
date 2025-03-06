@@ -4201,10 +4201,6 @@ module {
               %8 = arith.muli %7, %c32 : index
               %9 = arith.muli %6, %c32 : index
               %alloc_0 = memref.alloc() : memref<32x32xi32>
-              scf.for %arg8 = %c0 to %c32 step %c1 {
-                scf.for %arg9 = %c0 to %c32 step %c1 {
-                }
-              }
               %10 = func.call @__airrt_wait_all_1_0() : () -> !llvm.ptr
               %11 = scf.for %arg8 = %c0 to %c64 step %c32 iter_args(%arg9 = %10) -> (!llvm.ptr) {
                 %alloc_1 = memref.alloc() : memref<32x32xi32>
@@ -4264,17 +4260,6 @@ module {
                   scf.yield %39 : !llvm.ptr
                 }
                 func.call @__airrt_wait_all_0_2(%32, %25) : (!llvm.ptr, !llvm.ptr) -> ()
-                scf.for %arg10 = %c0 to %c32 step %c1 {
-                  scf.for %arg11 = %c0 to %c32 step %c1 {
-                    scf.for %arg12 = %c0 to %c32 step %c1 {
-                      %34 = memref.load %alloc_1[%arg10, %arg12] : memref<32x32xi32>
-                      %35 = memref.load %alloc_2[%arg12, %arg11] : memref<32x32xi32>
-                      %36 = memref.load %alloc_0[%arg10, %arg11] : memref<32x32xi32>
-                      %37 = arith.muli %34, %35 : i32
-                      %38 = arith.addi %36, %37 : i32
-                    }
-                  }
-                }
                 %33 = func.call @__airrt_wait_all_1_0() : () -> !llvm.ptr
                 memref.dealloc %alloc_1 : memref<32x32xi32>
                 memref.dealloc %alloc_2 : memref<32x32xi32>
